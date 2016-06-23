@@ -1,6 +1,3 @@
-# Kit de démarrage - Fournisseur d'identité FranceConnect
-
-Bientôt disponible.
 # Kit de démarrage FranceConnect - Fournisseur d'identité #
 
 Ce projet exemple propose un canevas de site web en [ASP.NET Core](http://www.dotnetfoundation.org/aspnet-core "ASP.NET Core") qui s’appuie sur FranceConnect pour identifier les internautes qui le souhaitent.
