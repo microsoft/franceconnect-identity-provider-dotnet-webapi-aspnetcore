@@ -1,0 +1,32 @@
+﻿@model WebApi_Identity_Provider_DotNet.ViewModels.Login.LoginViewModel
+
+<h2>Connexion</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            <form asp-route="Login" class="form-horizontal">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <input type="hidden" asp-for="SignInId" />
+                <div class="form-group">
+                    <label asp-for="Username" class="col-md-3 control-label"></label>
+                    <div class="col-md-9">
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="col-md-3 control-label"></label>
+                    <div class="col-md-9">
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-md-9">
+                        <button type="submit" class="btn btn-primary">Connexion</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
