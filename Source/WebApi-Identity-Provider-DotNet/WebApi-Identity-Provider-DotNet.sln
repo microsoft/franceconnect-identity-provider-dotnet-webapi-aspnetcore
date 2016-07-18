@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5B4C11E4-FC2C-4DFB-A20D-053286242E20}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{32C8DE3E-3CE3-44F9-A0FD-C195DFD0752A}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "WebApi-Identity-Provider-DotNet", "src\WebApi-Identity-Provider-DotNet\WebApi-Identity-Provider-DotNet.xproj", "{BCDE5427-543B-4B9C-9B92-2EA4F8FB9DC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCDE5427-543B-4B9C-9B92-2EA4F8FB9DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCDE5427-543B-4B9C-9B92-2EA4F8FB9DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCDE5427-543B-4B9C-9B92-2EA4F8FB9DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCDE5427-543B-4B9C-9B92-2EA4F8FB9DC4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BCDE5427-543B-4B9C-9B92-2EA4F8FB9DC4} = {5B4C11E4-FC2C-4DFB-A20D-053286242E20}
+	EndGlobalSection
+EndGlobal

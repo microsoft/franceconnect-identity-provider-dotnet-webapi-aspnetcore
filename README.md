@@ -1,10 +1,8 @@
-# Kit de démarrage FranceConnect - Fournisseur d'identité #
+# Kit de démarrage FranceConnect - Fournisseur d'identité (FI) #
 
-Ce projet exemple propose un canevas de site web en [ASP.NET Core](http://www.dotnetfoundation.org/aspnet-core "ASP.NET Core") qui s’appuie sur FranceConnect pour identifier les internautes qui le souhaitent.
+Ce projet exemple propose un canevas de site web en [ASP.NET Core](http://www.dotnetfoundation.org/aspnet-core "ASP.NET Core") 1.0 (RC2)/[IdentityServer](http://www.dotnetfoundation.org/thinktectureidentityserver "IdentityServer") qui s’appuie sur FranceConnect pour identifier les internautes qui le souhaitent. (Une version ASP.NET Core 1.0 sera très prochainement disponible.)
 
-Très prochainement disponible.
-
-Dans l'intervale, ce canevas peut être d'ores et déjà testé depuis l'environnement de test FranceConnect
+Le canevas ainsi proposé peut être testé directement depuis l'environnement de test FranceConnect
 
 Utilisateur :
 - Compte : jean
