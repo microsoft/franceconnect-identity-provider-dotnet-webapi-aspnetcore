@@ -1,0 +1,9 @@
+﻿@model WebApi_Identity_Provider_DotNet.ViewModels.Error.ErrorViewModel
+
+@{
+    var error_description = Model?.Error?.ErrorDescription ?? "Une erreur est survenue.";
+    var error_code = Model?.Error?.ErrorCode;
+}
+
+<h1 class="text-danger">Error</h1>
+<h2 class="text-danger">@error_code @error_description</h2>
