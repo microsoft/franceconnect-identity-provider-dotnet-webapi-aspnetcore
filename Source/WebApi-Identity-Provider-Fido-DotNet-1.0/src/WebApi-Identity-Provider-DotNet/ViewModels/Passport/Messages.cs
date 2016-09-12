@@ -26,4 +26,10 @@ namespace WebApi_Identity_Provider_DotNet.ViewModels.Passport
         public string ClientData { get; set; }
         public string AuthnrData { get; set; }
     }
+
+    public class ClientData
+    {
+        public string Challenge { get; set; }
+        public string UserPrompt { get; set; }
+    }
 }

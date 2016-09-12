@@ -167,6 +167,10 @@ namespace WebApi_Identity_Provider_DotNet.Controllers
 
                 var decodedClientData = message.ClientData.Rfc4648Base64UrlDecode();
                 var decodedAuthnrData = message.AuthnrData.Rfc4648Base64UrlDecode();
+
+                var clientDataJson = Encoding.UTF8.GetString(decodedClientData);
+                var clientData = JsonConvert.DeserializeObject<ClientData>(clientDataJson);
+                if (clientData.Challenge != challenge) return false;
                 
                 var sha256 = SHA256.Create();
                 var hashedClientData = sha256.ComputeHash(decodedClientData);
