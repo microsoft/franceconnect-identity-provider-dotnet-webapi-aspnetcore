@@ -23,14 +23,12 @@
 // You may obtain a copy of the License at https://opensource.org/licenses/MIT
 //
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using IdentityServer4;
 using IdentityServer4.Services;
-using WebApi_Identity_Provider_DotNet.ViewModels.Error;
+using WebApi_Identity_Provider_DotNet.Models.Error;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -38,24 +36,33 @@ namespace WebApi_Identity_Provider_DotNet.Controllers
 {
     public class ErrorController : Controller
     {
-        private readonly ErrorInteraction _errorInteraction;
+        private readonly IIdentityServerInteractionService _interaction;
+        private readonly IWebHostEnvironment _environment;
 
-        public ErrorController(ErrorInteraction errorInteraction)
+        public ErrorController(IIdentityServerInteractionService interaction, IWebHostEnvironment environment)
         {
-            _errorInteraction = errorInteraction;
+            _interaction = interaction;
+            _environment = environment;
         }
 
-        [Route(Constants.RoutePaths.Error, Name = "Error")]
-        public async Task<IActionResult> Index(string id)
+
+        /// <summary>
+        /// Shows the error page
+        /// </summary>
+        public async Task<IActionResult> Error(string errorId)
         {
             var vm = new ErrorViewModel();
 
-            if (id != null)
+            // retrieve error details from identityserver
+            var message = await _interaction.GetErrorContextAsync(errorId);
+            if (message != null)
             {
-                var message = await _errorInteraction.GetRequestAsync(id);
-                if (message != null)
+                vm.Error = message;
+
+                if (!_environment.IsDevelopment())
                 {
-                    vm.Error = message;
+                    // only show in development
+                    message.ErrorDescription = null;
                 }
             }
 
