@@ -33,71 +33,84 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WebApi_Identity_Provider_DotNet.Configuration;
-using WebApi_Identity_Provider_DotNet.Services;
 using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography.X509Certificates;
 using System.IO;
 using IdentityServer4.Services;
 using WebApi_Identity_Provider_DotNet.Jwt;
-using IdentityServer4.Services.Default;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using IdentityServer4.Validation;
+using IdentityServer4.Services.Default;
+using Microsoft.Extensions.Hosting;
 
 namespace WebApi_Identity_Provider_DotNet
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _environment;
-
-        public Startup(IHostingEnvironment env)
+        public IWebHostEnvironment Environment { get; }
+        public IConfiguration Configuration { get; set; }
+        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            _environment = env;
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Environment = environment;
+            Configuration = configuration;
+            // Configuration loads behind the scenes since 2.0, with sources defined in program.cs https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/?view=aspnetcore-3.1#add-configuration-providers
         }
 
-        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            var builder = services.AddIdentityServer();
-            // remove default services
-            builder.Services.Remove(builder.Services.SingleOrDefault(s => s.ImplementationType == typeof(DefaultTokenCreationService)));
-            builder.Services.Remove(builder.Services.SingleOrDefault(s => s.ImplementationType == typeof(TokenValidator)));
-            // add custom services
+            services.AddControllersWithViews();
+            
+            var identityConfig = new IdentityInMemoryConfiguration(Configuration["FranceConnect:ClientId"], Configuration["FranceConnect:ClientSecret"], Configuration["FranceConnect:RedirectUri"]);
+            services.AddSingleton(identityConfig);
+
+            var builder = services.AddIdentityServer(options =>
+            {
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseSuccessEvents = true;
+
+                // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
+                options.EmitStaticAudienceClaim = true;
+
+                options.UserInteraction.ErrorUrl = "/error";
+            });
+            //The developer signing credential is intended for development, add your own on 
+            builder.AddDeveloperSigningCredential();
+
+            // remove default token validation & creation services, which do not support FranceConnect signature algorithm
+            builder.Services.Remove(builder.Services.SingleOrDefault(s => s.ServiceType== typeof(ITokenCreationService)));
+            builder.Services.Remove(builder.Services.SingleOrDefault(s => s.ServiceType == typeof(ITokenValidator)));
+
+            // add our custom services working with the HS256 algorithm
             builder.Services.TryAddTransient<ITokenCreationService, FranceConnectTokenCreationService>();
             builder.Services.TryAddTransient<ITokenValidator, FranceConnectTokenValidator>();
-            builder.AddInMemoryClients(Clients.Get());
-            builder.AddInMemoryScopes(Scopes.Get());
-            builder.AddInMemoryUsers(Users.Get());
 
-            // Add framework services.
-            services.AddMvc();
-            services.AddTransient<SignInService>();
+            // in-memory, code 
+            builder.AddTestUsers(identityConfig.TestUsers);
+            builder.AddInMemoryIdentityResources(identityConfig.IdentityResources);
+            builder.AddInMemoryClients(identityConfig.Clients);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseIdentityServer();
-
             app.UseStaticFiles();
-            app.UseMvcWithDefaultRoute();
+
+            app.UseRouting();
+            app.UseIdentityServer();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapDefaultControllerRoute();
+            });
         }
     }
 }
