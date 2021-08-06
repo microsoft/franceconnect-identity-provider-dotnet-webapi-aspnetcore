@@ -33,14 +33,22 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using IdentityModel;
-using IdentityServer4;
 using Newtonsoft.Json.Linq;
 using WebApi_Identity_Provider_DotNet.Configuration;
+using static IdentityServer4.IdentityServerConstants;
 
 namespace WebApi_Identity_Provider_DotNet.Jwt
 {
     public class FranceConnectTokenCreationService : ITokenCreationService
     {
+
+        private readonly IdentityInMemoryConfiguration _identityConfig;
+
+        public FranceConnectTokenCreationService(IdentityInMemoryConfiguration identityConfig)
+        {
+            _identityConfig = identityConfig;
+        }
+
         public virtual async Task<string> CreateTokenAsync(Token token)
         {
             var header = await CreateHeaderAsync(token);
@@ -51,7 +59,7 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
 
         protected virtual Task<JwtHeader> CreateHeaderAsync(Token token)
         {
-            JwtHeader header = new JwtHeader(new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Clients.FranceConnectSecret)), "HS256"));
+            JwtHeader header = new JwtHeader(new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_identityConfig.FranceConnectSecret)), "HS256"));
 
             return Task.FromResult(header);
         }
@@ -60,13 +68,13 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
         {
             var payload = new JwtPayload(
                 token.Issuer,
-                token.Audience,
+                token.Audiences.FirstOrDefault(),
                 null,
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddSeconds(token.Lifetime));
 
             var amrClaims = token.Claims.Where(x => x.Type == JwtClaimTypes.AuthenticationMethod);
-            var jsonClaims = token.Claims.Where(x => x.ValueType == Constants.ClaimValueTypes.Json);
+            var jsonClaims = token.Claims.Where(x => x.ValueType == ClaimValueTypes.Json);
             var normalClaims = token.Claims.Except(amrClaims).Except(jsonClaims);
 
             payload.AddClaims(normalClaims);
