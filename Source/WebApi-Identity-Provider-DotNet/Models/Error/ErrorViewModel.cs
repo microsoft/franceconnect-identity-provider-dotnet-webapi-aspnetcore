@@ -29,10 +29,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi_Identity_Provider_DotNet.ViewModels.Error
+namespace WebApi_Identity_Provider_DotNet.Models.Error
 {
     public class ErrorViewModel
     {
+        public ErrorViewModel()
+        {
+        }
+
+        public ErrorViewModel(string error)
+        {
+            Error = new ErrorMessage { Error = error };
+        }
+
         public ErrorMessage Error { get; set; }
     }
 }

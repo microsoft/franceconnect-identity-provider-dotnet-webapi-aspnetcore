@@ -28,12 +28,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi_Identity_Provider_DotNet.ViewModels.Consent
+namespace WebApi_Identity_Provider_DotNet.Models.Consent
 {
-    public class ConsentViewModel
+
+    public class ConsentInputModel
     {
-        public string ConsentId { get; set; }
-        public string ClientName { get; set; }
-        public IEnumerable<string> Scopes { get; set; }
+        public string Button { get; set; }
+        public IEnumerable<string> ScopesConsented { get; set; }
+        public bool RememberConsent { get; set; }
+        public string ReturnUrl { get; set; }
+        public string Description { get; set; }
     }
 }

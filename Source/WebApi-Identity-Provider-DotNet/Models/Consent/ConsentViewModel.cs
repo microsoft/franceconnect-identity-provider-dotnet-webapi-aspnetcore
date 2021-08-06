@@ -25,25 +25,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi_Identity_Provider_DotNet.ViewModels.Login
+namespace WebApi_Identity_Provider_DotNet.Models.Consent
 {
-    public class LoginViewModel
+
+    public class ConsentViewModel : ConsentInputModel
     {
-        public string SignInId { get; set; }
+        public string ClientName { get; set; }
+        public string ClientUrl { get; set; }
+        public string ClientLogoUrl { get; set; }
+        public bool AllowRememberConsent { get; set; }
 
-        [Required]
-        [Display(Name = "Nom d'utilisateur")]
-        public string Username { get; set; }
-
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = "Mot de passe")]
-        public string Password { get; set; }
-
-        public string ErrorMessage { get; set; }
+        public IEnumerable<ScopeViewModel> IdentityScopes { get; set; }
+        public IEnumerable<ScopeViewModel> ApiScopes { get; set; }
     }
 }
