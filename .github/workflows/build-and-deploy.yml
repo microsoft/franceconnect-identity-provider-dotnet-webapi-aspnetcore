@@ -2,10 +2,12 @@ name: Build and deploy .NET Core app to WebApp franceconnect-identity-provider-d
 on:
   workflow_dispatch:
   pull_request:
+    paths:
+      - 'Source/**'
   push:
-    branches:
-        - master
-        - develop
+    branches: [ main, develop ]
+    paths:
+      - 'Source/**'
 env:
   AZURE_WEBAPP_NAME: franceconnect-identity-provider-dotnet-webapi-aspnetcore
   AZURE_WEBAPP_PACKAGE_PATH: Source/WebApi-Identity-Provider-DotNet/publish
