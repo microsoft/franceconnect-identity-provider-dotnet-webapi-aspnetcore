@@ -23,36 +23,25 @@
 // You may obtain a copy of the License at https://opensource.org/licenses/MIT
 //
 
-using IdentityServer4.Services.InMemory;
+using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi_Identity_Provider_DotNet.Services
+namespace WebApi_Identity_Provider_DotNet.Models.Error
 {
-    public class SignInService
+    public class ErrorViewModel
     {
-        private readonly List<InMemoryUser> _users;
-
-        public SignInService(List<InMemoryUser> users)
+        public ErrorViewModel()
         {
-            _users = users;
-        }
-        
-        public bool ValidateCredentials(string username, string password)
-        {
-            var user = FindByUsername(username);
-            if (user != null)
-            {
-                return user.Password.Equals(password);
-            }
-            return false;
         }
 
-        public InMemoryUser FindByUsername(string username)
+        public ErrorViewModel(string error)
         {
-            return _users.FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+            Error = new ErrorMessage { Error = error };
         }
+
+        public ErrorMessage Error { get; set; }
     }
 }

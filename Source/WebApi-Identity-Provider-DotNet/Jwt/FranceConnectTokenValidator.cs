@@ -24,22 +24,24 @@
 //
 
 using IdentityModel;
-using IdentityServer4;
-using IdentityServer4.Configuration;
-using IdentityServer4.Hosting;
+using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using IdentityServer4.Stores;
+using IdentityServer4.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.Text;
+using IdentityServer4;
+using System.ComponentModel;
 using WebApi_Identity_Provider_DotNet.Configuration;
 
 namespace WebApi_Identity_Provider_DotNet.Jwt
@@ -49,24 +51,26 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
     {
         private readonly ILogger _logger;
         private readonly IdentityServerOptions _options;
-        private readonly IdentityServerContext _context;
-        private readonly ITokenHandleStore _tokenHandles;
+        private readonly IHttpContextAccessor _context;
+        private readonly IReferenceTokenStore _referenceTokenStore;
         private readonly ICustomTokenValidator _customValidator;
         private readonly IClientStore _clients;
-        private readonly IEnumerable<IValidationKeysStore> _keys;
+        private readonly IProfileService _profile;
+        private readonly IdentityInMemoryConfiguration _identityConfig;
 
-        public FranceConnectTokenValidator(IdentityServerOptions options, IdentityServerContext context, IClientStore clients, ITokenHandleStore tokenHandles, ICustomTokenValidator customValidator, IEnumerable<IValidationKeysStore> keys, ILogger<TokenValidator> logger)
+        public FranceConnectTokenValidator(IdentityServerOptions options, IHttpContextAccessor context, IClientStore clients, IProfileService profile, IReferenceTokenStore referenceTokenStore, IRefreshTokenStore refreshTokenStore, ICustomTokenValidator customValidator, IdentityInMemoryConfiguration identityConfig,ILogger<ITokenValidator> logger)
         {
             _options = options;
             _context = context;
             _clients = clients;
-            _tokenHandles = tokenHandles;
+            _profile = profile;
+            _referenceTokenStore = referenceTokenStore;
             _customValidator = customValidator;
-            _keys = keys;
-            _logger = logger;
+            _identityConfig = identityConfig;
+            _logger = logger; 
         }
 
-        public virtual async Task<TokenValidationResult> ValidateIdentityTokenAsync(string token, string clientId = null, bool validateLifetime = true)
+        public async Task<TokenValidationResult> ValidateIdentityTokenAsync(string token, string clientId = null, bool validateLifetime = true)
         {
             _logger.LogTrace("Start identity token validation");
 
@@ -87,21 +91,21 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
                 }
             }
 
-            var client = await _clients.FindClientByIdAsync(clientId);
+            var client = await _clients.FindEnabledClientByIdAsync(clientId);
             if (client == null)
             {
-                _logger.LogError("Unknown or diabled client.");
+                _logger.LogError("Unknown or disabled client: {clientId}.", clientId);
                 return Invalid(OidcConstants.ProtectedResourceErrors.InvalidToken);
             }
 
-            var keys = new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Clients.FranceConnectSecret)) };
-            var result = await ValidateJwtAsync(token, clientId, keys, validateLifetime);
+            var keys = new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_identityConfig.FranceConnectSecret)) };
+            var result = await ValidateJwtAsync(token, keys, audience: clientId, validateLifetime: validateLifetime);
 
             result.Client = client;
 
             if (result.IsError)
             {
-                _logger.LogError("Error validating JWT");
+                LogError("Error validating JWT");
                 return result;
             }
 
@@ -109,18 +113,16 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
 
             if (customResult.IsError)
             {
-                _logger.LogError("Custom validator failed: " + (customResult.Error ?? "unknown"));
+                LogError("Custom validator failed: " + (customResult.Error ?? "unknown"));
                 return customResult;
             }
 
-            _logger.LogInformation("Token validation succeded");
+            LogSuccess();
             return customResult;
         }
 
-        public virtual async Task<TokenValidationResult> ValidateAccessTokenAsync(string token, string expectedScope = null)
+        public async Task<TokenValidationResult> ValidateAccessTokenAsync(string token, string expectedScope = null)
         {
-            _logger.LogTrace("Start access token validation");
-
             TokenValidationResult result;
 
             if (token.Contains("."))
@@ -139,8 +141,7 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
 
                 result = await ValidateJwtAsync(
                     token,
-                    string.Format(Constants.AccessTokenAudience, _context.GetIssuerUri().EnsureTrailingSlash()),
-                    new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Clients.FranceConnectSecret)) });
+                    new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_identityConfig.FranceConnectSecret)) });
             }
             else
             {
@@ -164,56 +165,145 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
                 return result;
             }
 
+            // make sure client is still active (if client_id claim is present)
+            var clientClaim = result.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.ClientId);
+            if (clientClaim != null)
+            {
+                var client = await _clients.FindEnabledClientByIdAsync(clientClaim.Value);
+                if (client == null)
+                {
+                    result.IsError = true;
+                    result.Error = OidcConstants.ProtectedResourceErrors.InvalidToken;
+                    result.Claims = null;
+
+                    return result;
+                }
+            }
+
+            // make sure user is still active (if sub claim is present)
+            var subClaim = result.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Subject);
+            if (subClaim != null)
+            {
+                var principal = Principal.Create("tokenvalidator", result.Claims.ToArray());
+
+                if (!string.IsNullOrWhiteSpace(result.ReferenceTokenId))
+                {
+                    principal.Identities.First().AddClaim(new Claim(JwtClaimTypes.ReferenceTokenId, result.ReferenceTokenId));
+                }
+
+                var isActiveCtx = new IsActiveContext(principal, result.Client, IdentityServerConstants.ProfileIsActiveCallers.AccessTokenValidation);
+                await _profile.IsActiveAsync(isActiveCtx);
+
+                if (isActiveCtx.IsActive == false)
+                {
+                    _logger.LogError("User marked as not active: {subject}", subClaim.Value);
+
+                    result.IsError = true;
+                    result.Error = OidcConstants.ProtectedResourceErrors.InvalidToken;
+                    result.Claims = null;
+
+                    return result;
+                }
+            }
+
+            // check expected scope(s)
             if (!string.IsNullOrWhiteSpace(expectedScope))
             {
                 var scope = result.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Scope && c.Value == expectedScope);
                 if (scope == null)
                 {
-                    _logger.LogError(string.Format("Checking for expected scope {0} failed", expectedScope));
+                    LogError($"Checking for expected scope {expectedScope} failed");
                     return Invalid(OidcConstants.ProtectedResourceErrors.InsufficientScope);
                 }
             }
 
+            _logger.LogDebug("Calling into custom token validator: {type}", _customValidator.GetType().FullName);
             var customResult = await _customValidator.ValidateAccessTokenAsync(result);
 
             if (customResult.IsError)
             {
-                _logger.LogError("Custom validator failed: " + (customResult.Error ?? "unknown"));
+                LogError("Custom validator failed: " + (customResult.Error ?? "unknown"));
                 return customResult;
             }
 
-            _logger.LogInformation("Token validation Succeded");
+            LogSuccess();
             return customResult;
         }
 
-        private async Task<TokenValidationResult> ValidateJwtAsync(string jwt, string audience, IEnumerable<SymmetricSecurityKey> symmetricKeys, bool validateLifetime = true)
+        private async Task<TokenValidationResult> ValidateJwtAsync(string jwt, IEnumerable<SymmetricSecurityKey> symmetricKeys, bool validateLifetime = true, string audience = null)
         {
             var handler = new JwtSecurityTokenHandler();
             handler.InboundClaimTypeMap.Clear();
 
-
             var parameters = new TokenValidationParameters
             {
-                ValidIssuer = _context.GetIssuerUri(),
+                ValidIssuer = _context.HttpContext.GetIdentityServerIssuerUri(),
                 IssuerSigningKeys = symmetricKeys,
-                ValidateLifetime = validateLifetime,
-                ValidAudience = audience
+                ValidateLifetime = validateLifetime
             };
+
+            if (!string.IsNullOrWhiteSpace(audience))
+            {
+                parameters.ValidAudience = audience;
+            }
+            else
+            {
+                parameters.ValidateAudience = false;
+            }
 
             try
             {
-                SecurityToken jwtToken;
-                var id = handler.ValidateToken(jwt, parameters, out jwtToken);
+                var id = handler.ValidateToken(jwt, parameters, out var securityToken);
+                var jwtSecurityToken = securityToken as JwtSecurityToken;
+
+                // if no audience is specified, we make at least sure that it is an access token
+                if (string.IsNullOrWhiteSpace(audience))
+                {
+                    if (!string.IsNullOrWhiteSpace(_options.AccessTokenJwtType))
+                    {
+                        var type = jwtSecurityToken.Header.Typ;
+                        if (!string.Equals(type, _options.AccessTokenJwtType))
+                        {
+                            return new TokenValidationResult
+                            {
+                                IsError = true,
+                                Error = "invalid JWT token type"
+                            };
+                        }
+
+                    }
+                }
 
                 // load the client that belongs to the client_id claim
                 Client client = null;
                 var clientId = id.FindFirst(JwtClaimTypes.ClientId);
                 if (clientId != null)
                 {
-                    client = await _clients.FindClientByIdAsync(clientId.Value);
+                    client = await _clients.FindEnabledClientByIdAsync(clientId.Value);
                     if (client == null)
                     {
                         throw new InvalidOperationException("Client does not exist anymore.");
+                    }
+                }
+
+                var claims = id.Claims.ToList();
+
+                // check the scope format (array vs space delimited string)
+                var scopes = claims.Where(c => c.Type == JwtClaimTypes.Scope).ToArray();
+                if (scopes.Any())
+                {
+                    foreach (var scope in scopes)
+                    {
+                        if (scope.Value.Contains(" "))
+                        {
+                            claims.Remove(scope);
+
+                            var values = scope.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var value in values)
+                            {
+                                claims.Add(new Claim(JwtClaimTypes.Scope, value));
+                            }
+                        }
                     }
                 }
 
@@ -221,49 +311,59 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
                 {
                     IsError = false,
 
-                    Claims = id.Claims,
+                    Claims = claims,
                     Client = client,
                     Jwt = jwt
                 };
             }
+            catch (SecurityTokenExpiredException expiredException)
+            {
+                _logger.LogInformation(expiredException, "JWT token validation error: {exception}", expiredException.Message);
+                return Invalid(OidcConstants.ProtectedResourceErrors.ExpiredToken);
+            }
             catch (Exception ex)
             {
-                _logger.LogError("JWT token validation error", ex);
+                _logger.LogError(ex, "JWT token validation error: {exception}", ex.Message);
                 return Invalid(OidcConstants.ProtectedResourceErrors.InvalidToken);
             }
         }
 
         private async Task<TokenValidationResult> ValidateReferenceAccessTokenAsync(string tokenHandle)
         {
-            var token = await _tokenHandles.GetAsync(tokenHandle);
+            var token = await _referenceTokenStore.GetReferenceTokenAsync(tokenHandle);
 
             if (token == null)
             {
-                _logger.LogError("Token handle not found");
-                return Invalid(OidcConstants.ProtectedResourceErrors.InvalidToken);
-            }
-
-            if (token.Type != OidcConstants.TokenTypes.AccessToken)
-            {
-                _logger.LogError("Token handle does not resolve to an access token - but instead to: " + token.Type);
-
-                await _tokenHandles.RemoveAsync(tokenHandle);
+                LogError("Invalid reference token.");
                 return Invalid(OidcConstants.ProtectedResourceErrors.InvalidToken);
             }
 
             if (DateTimeOffset.UtcNow >= token.CreationTime.AddSeconds(token.Lifetime))
             {
-                _logger.LogError("Token expired.");
+                LogError("Token expired.");
 
-                await _tokenHandles.RemoveAsync(tokenHandle);
+                await _referenceTokenStore.RemoveReferenceTokenAsync(tokenHandle);
                 return Invalid(OidcConstants.ProtectedResourceErrors.ExpiredToken);
+            }
+
+            // load the client that is defined in the token
+            Client client = null;
+            if (token.ClientId != null)
+            {
+                client = await _clients.FindEnabledClientByIdAsync(token.ClientId);
+            }
+
+            if (client == null)
+            {
+                LogError($"Client deleted or disabled: {token.ClientId}");
+                return Invalid(OidcConstants.ProtectedResourceErrors.InvalidToken);
             }
 
             return new TokenValidationResult
             {
                 IsError = false,
 
-                Client = token.Client,
+                Client = client,
                 Claims = ReferenceTokenToClaims(token),
                 ReferenceToken = token,
                 ReferenceTokenId = tokenHandle
@@ -274,14 +374,17 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtClaimTypes.Audience, token.Audience),
                 new Claim(JwtClaimTypes.Issuer, token.Issuer),
-                new Claim(JwtClaimTypes.NotBefore, token.CreationTime.ToEpochTime().ToString()),
-                new Claim(JwtClaimTypes.Expiration, token.CreationTime.AddSeconds(token.Lifetime).ToEpochTime().ToString())
+                new Claim(JwtClaimTypes.NotBefore, new DateTimeOffset(token.CreationTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+                new Claim(JwtClaimTypes.Expiration, new DateTimeOffset(token.CreationTime).AddSeconds(token.Lifetime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
 
-            claims.AddRange(token.Claims);
+            foreach (var aud in token.Audiences)
+            {
+                claims.Add(new Claim(JwtClaimTypes.Audience, aud));
+            }
 
+            claims.AddRange(token.Claims);
             return claims;
         }
 
@@ -296,7 +399,7 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
             }
             catch (Exception ex)
             {
-                _logger.LogError("Malformed JWT token", ex);
+                _logger.LogError(ex, "Malformed JWT token: {exception}", ex.Message);
                 return null;
             }
         }
@@ -310,18 +413,14 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
             };
         }
 
-    }
-
-    public static class StringExtensions
-    {
-        public static string EnsureTrailingSlash(this string url)
+        private void LogError(string message)
         {
-            if (!url.EndsWith("/"))
-            {
-                return url + "/";
-            }
+            _logger.LogError(message + "\n{@logMessage}");
+        }
 
-            return url;
+        private void LogSuccess()
+        {
+            _logger.LogDebug("Token validation success\n{@logMessage}");
         }
     }
 }

@@ -23,40 +23,22 @@
 // You may obtain a copy of the License at https://opensource.org/licenses/MIT
 //
 
-using IdentityModel;
-using IdentityServer4.Services.InMemory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace WebApi_Identity_Provider_DotNet.Configuration
+namespace WebApi_Identity_Provider_DotNet.Models.Consent
 {
-    public class Users
+
+    public class ConsentViewModel : ConsentInputModel
     {
-        public static List<InMemoryUser> Get()
-        {
-            return new List<InMemoryUser>
-            {
-                new InMemoryUser
-                {
-                    Subject = "6867085672678036750625",
-                    Username = "jean",
-                    Password = "password",
-                    Claims = new Claim[]
-                    {
-                        new Claim(JwtClaimTypes.GivenName, "Jean"),
-                        new Claim(JwtClaimTypes.FamilyName, "Dupont"),
-                        new Claim(JwtClaimTypes.Email, "jean.dupont@contoso.com"),
-                        new Claim(JwtClaimTypes.BirthDate, "1993-06-16"),
-                        new Claim(JwtClaimTypes.Gender, "male"),
-                        new Claim("birthplace", "75056"),
-                        new Claim("birthcountry", "99100"),
-                        new Claim(JwtClaimTypes.PreferredUserName, "Jean Dupont")
-                    }
-                }
-            };
-        }
+        public string ClientName { get; set; }
+        public string ClientUrl { get; set; }
+        public string ClientLogoUrl { get; set; }
+        public bool AllowRememberConsent { get; set; }
+
+        public IEnumerable<ScopeViewModel> IdentityScopes { get; set; }
+        public IEnumerable<ScopeViewModel> ApiScopes { get; set; }
     }
 }

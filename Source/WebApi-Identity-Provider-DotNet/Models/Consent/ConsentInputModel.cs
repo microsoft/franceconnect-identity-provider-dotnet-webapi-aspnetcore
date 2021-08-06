@@ -23,16 +23,20 @@
 // You may obtain a copy of the License at https://opensource.org/licenses/MIT
 //
 
-using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi_Identity_Provider_DotNet.ViewModels.Error
+namespace WebApi_Identity_Provider_DotNet.Models.Consent
 {
-    public class ErrorViewModel
+
+    public class ConsentInputModel
     {
-        public ErrorMessage Error { get; set; }
+        public string Button { get; set; }
+        public IEnumerable<string> ScopesConsented { get; set; }
+        public bool RememberConsent { get; set; }
+        public string ReturnUrl { get; set; }
+        public string Description { get; set; }
     }
 }
