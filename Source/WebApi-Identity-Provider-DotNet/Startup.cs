@@ -60,7 +60,9 @@ namespace WebApi_Identity_Provider_DotNet
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            
+            services.AddHealthChecks();
+            //To add specific health checks, such as database probe https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks-1
+
             var identityConfig = new IdentityInMemoryConfiguration(Configuration["FranceConnect:ClientId"], Configuration["FranceConnect:ClientSecret"], Configuration["FranceConnect:RedirectUri"]);
             services.AddSingleton(identityConfig);
 
@@ -110,6 +112,7 @@ namespace WebApi_Identity_Provider_DotNet
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
