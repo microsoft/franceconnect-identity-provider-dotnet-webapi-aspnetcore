@@ -59,6 +59,12 @@ namespace WebApi_Identity_Provider_DotNet
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            if (string.IsNullOrEmpty(Configuration["FranceConnect:ClientSecret"]))
+            {
+                throw new InvalidOperationException("FC Client Secret not found. It must be added to the configuration, through User Secrets for example.");
+                // User-Secrets documentation : https://docs.asp.net/en/latest/security/app-secrets.html
+            }
+
             services.AddControllersWithViews();
             services.AddHealthChecks();
             //To add specific health checks, such as database probe https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks-1
@@ -102,6 +108,12 @@ namespace WebApi_Identity_Provider_DotNet
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+                app.UseHttpsRedirection();
             }
             app.UseStaticFiles();
 
