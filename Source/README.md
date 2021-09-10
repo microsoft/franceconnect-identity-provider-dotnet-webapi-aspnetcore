@@ -11,10 +11,10 @@
 2. Exécutez la commande `dotnet restore`, suivie de `dotnet tool restore`, afin de restaurer les dépendances et outils utiles pour ce projet.
 3. Mettez en place la configuration de votre choix, en ajustant le fichier appsettings.json
 4. Faites de même pour les éléments de configuration secrets, tels que le *ClientSecret* France Connect, à l'aide de la commande `dotnet user-secrets set "FranceConnect:ClientSecret" "VotreSecret"`.
-5. Par défaut dans cet environnement de développement, les données sont persistées en mémoire, et donc effacées dès la clôture de l'application. Vous pouvez configurer la base de données de votre choix.
+5. Par défaut dans cet environnement de développement, les données sont persistées en mémoire, et donc effacées dès la clôture de l'application. Vous pouvez toutefois configurer la base de données de votre choix.
 
 6. Lancez le projet à l'aide de la commande `dotnet run`.
 
-   Vous pouvez alors naviguer vers le fournisseur de service à l'adresse configurée, par défaut <http://localhost:4242>, et tester les interactions de connexion ou d'accès à des données.
+   Vous pouvez alors naviguer vers le fournisseur d'identité à l'adresse configurée, par défaut <https://localhost:5001>, et observer le document de découverte OpenIDConnect généré à l'adresse <https://localhost:5001/.well-known/openid-configuration> .
 
-Pour aller plus loin, vous pouvez également suivre ce [guide détaillé](/Documentation/GitHub%20Actions%20%26%20D%C3%A9ploiement%20sur%20Azure.md) pour le publier sur un environnement Cloud Azure.
+Pour aller plus loin, vous pouvez également suivre les documentations complètes, disponibles sous [le dossier /Documentation du répértoire](/Documentation/README.md), comportant notamment ce [guide détaillé](/Documentation/GitHub%20Actions%20%26%20D%C3%A9ploiement%20sur%20Azure.md) pour publier l'application sur un environnement Cloud Azure.
