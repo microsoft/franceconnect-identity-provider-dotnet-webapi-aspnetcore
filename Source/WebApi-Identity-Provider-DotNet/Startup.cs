@@ -52,7 +52,6 @@ namespace WebApi_Identity_Provider_DotNet
         {
             Environment = environment;
             Configuration = configuration;
-            // Configuration loads behind the scenes since 2.0, with sources defined in program.cs https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/?view=aspnetcore-3.1#add-configuration-providers
         }
 
 
@@ -67,7 +66,7 @@ namespace WebApi_Identity_Provider_DotNet
 
             services.AddControllersWithViews();
             services.AddHealthChecks();
-            //To add specific health checks, such as database probe https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks-1
+            // To add specific health checks, such as database probe, read more here https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks-1
 
             var identityConfig = new IdentityInMemoryConfiguration(Configuration["FranceConnect:ClientId"], Configuration["FranceConnect:ClientSecret"], Configuration["FranceConnect:RedirectUri"]);
             services.AddSingleton(identityConfig);
@@ -84,7 +83,7 @@ namespace WebApi_Identity_Provider_DotNet
 
                 options.UserInteraction.ErrorUrl = "/error";
             });
-            //The developer signing credential is intended for development, add your own on 
+            // The developer signing credential is intended for development, add your own on production environments
             builder.AddDeveloperSigningCredential();
 
             // remove default token validation & creation services, which do not support FranceConnect signature algorithm
@@ -95,7 +94,7 @@ namespace WebApi_Identity_Provider_DotNet
             builder.Services.TryAddTransient<ITokenCreationService, FranceConnectTokenCreationService>();
             builder.Services.TryAddTransient<ITokenValidator, FranceConnectTokenValidator>();
 
-            // in-memory, code 
+            // in-memory resources. To use your own database, see https://identityserver4.readthedocs.io/en/release/quickstarts/8_entity_framework.html
             builder.AddTestUsers(identityConfig.TestUsers);
             builder.AddInMemoryIdentityResources(identityConfig.IdentityResources);
             builder.AddInMemoryClients(identityConfig.Clients);
