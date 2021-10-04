@@ -1,0 +1,16 @@
+{
+    "Registrations": [
+        {
+            "component": {
+                "type": "git",
+                "git": {
+                    "repositoryUrl": "https://github.com/IdentityServer/IdentityServer4.Templates",
+                    "commitHash": "ecb2f5d5af77b7a64d25881ef1a759b9aa6361e6"
+                },
+                "DevelopmentDependency": [
+                    false
+                ]
+            }
+        }
+    ]
+}
