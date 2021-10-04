@@ -1,24 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using IdentityServer4.Models;
+using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using WebApi_Identity_Provider_DotNet.Configuration;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using IdentityServer4.Services;
-using WebApi_Identity_Provider_DotNet.Jwt;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using IdentityServer4.Validation;
-using IdentityServer4.Services.Default;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
+using WebApi_Identity_Provider_DotNet.Configuration;
 
 namespace WebApi_Identity_Provider_DotNet
 {
@@ -62,16 +55,18 @@ namespace WebApi_Identity_Provider_DotNet
                 options.UserInteraction.ErrorUrl = "/error";
                 options.Discovery.ShowKeySet = false;
             });
-            // The developer signing credential is intended for development, add your own on production environments
-            builder.AddDeveloperSigningCredential();
+            // Instead of adding a valid asymmetric credential through builder.AddSigningCredential,
+            // we use internal methods to manually add our signing and validation key credential (HS256, the only signing mechanism supported by FranceConnect as of today, which is symmetric and thus refused by builder.AddSigningCredential).
+            // This is a workaround, and today there are better options such as migrating to another Identity Provider like OpenIddict, which properly supports symmetric credential.
+            SigningCredentials franceConnectSigningCredential = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfig.FranceConnectSecret)), "HS256");
+            SecurityKeyInfo franceConnectSecuritykeyInfo = new SecurityKeyInfo
+            {
+                Key = franceConnectSigningCredential.Key,
+                SigningAlgorithm = franceConnectSigningCredential.Algorithm
+            };
 
-            // remove default token validation & creation services, which do not support FranceConnect signature algorithm
-            builder.Services.Remove(builder.Services.SingleOrDefault(s => s.ServiceType== typeof(ITokenCreationService)));
-            builder.Services.Remove(builder.Services.SingleOrDefault(s => s.ServiceType == typeof(ITokenValidator)));
-
-            // add our custom services working with the HS256 algorithm
-            builder.Services.TryAddTransient<ITokenCreationService, FranceConnectTokenCreationService>();
-            builder.Services.TryAddTransient<ITokenValidator, FranceConnectTokenValidator>();
+            builder.Services.AddSingleton<ISigningCredentialStore>(new InMemorySigningCredentialsStore(franceConnectSigningCredential));
+            builder.Services.AddSingleton<IValidationKeysStore>(new InMemoryValidationKeysStore(new[] { franceConnectSecuritykeyInfo }));
 
             // in-memory resources. To use your own database, see https://identityserver4.readthedocs.io/en/release/quickstarts/8_entity_framework.html
             builder.AddTestUsers(identityConfig.TestUsers);
