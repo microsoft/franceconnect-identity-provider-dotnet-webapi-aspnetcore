@@ -60,6 +60,7 @@ namespace WebApi_Identity_Provider_DotNet
                 options.EmitStaticAudienceClaim = true;
 
                 options.UserInteraction.ErrorUrl = "/error";
+                options.Discovery.ShowKeySet = false;
             });
             // The developer signing credential is intended for development, add your own on production environments
             builder.AddDeveloperSigningCredential();
