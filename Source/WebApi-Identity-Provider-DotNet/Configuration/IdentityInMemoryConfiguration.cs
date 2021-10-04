@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Test;
+using System.Collections.Generic;
+using System.Security.Claims;
 using static IdentityServer4.IdentityServerConstants;
 
 namespace WebApi_Identity_Provider_DotNet.Configuration
