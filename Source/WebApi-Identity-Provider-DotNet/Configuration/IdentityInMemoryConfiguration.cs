@@ -81,6 +81,7 @@ namespace WebApi_Identity_Provider_DotNet.Configuration
                     {
                         new Secret(FranceConnectSecret.Sha256())
                     },
+                    AllowedIdentityTokenSigningAlgorithms=new string[]{"HS256"},
                     AllowedScopes = new List<string>
                     {
                         StandardScopes.OpenId,
