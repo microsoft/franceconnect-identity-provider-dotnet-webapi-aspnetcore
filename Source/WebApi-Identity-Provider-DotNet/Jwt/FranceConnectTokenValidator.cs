@@ -1,52 +1,34 @@
-﻿//
-// The MIT License (MIT)
-// Copyright (c) 2016 Microsoft France
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//
-// You may obtain a copy of the License at https://opensource.org/licenses/MIT
-//
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE-IdentityServer4-Templates.md in the project root for license information.
+
+// This file was changed for the needs of the projects. These modifications are subject to 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 using IdentityModel;
+using IdentityServer4;
+using IdentityServer4.Configuration;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
+using IdentityServer4.Stores;
 using IdentityServer4.Validation;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using IdentityServer4.Stores;
-using IdentityServer4.Configuration;
-using Microsoft.AspNetCore.Http;
 using System.Text;
-using IdentityServer4;
-using System.ComponentModel;
+using System.Threading.Tasks;
 using WebApi_Identity_Provider_DotNet.Configuration;
 
 namespace WebApi_Identity_Provider_DotNet.Jwt
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
+
     public class FranceConnectTokenValidator : ITokenValidator
     {
         private readonly ILogger _logger;
@@ -123,6 +105,7 @@ namespace WebApi_Identity_Provider_DotNet.Jwt
 
         public async Task<TokenValidationResult> ValidateAccessTokenAsync(string token, string expectedScope = null)
         {
+            _logger.LogTrace("Start access token validation");
             TokenValidationResult result;
 
             if (token.Contains("."))
