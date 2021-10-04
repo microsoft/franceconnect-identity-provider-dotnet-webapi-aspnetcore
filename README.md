@@ -13,9 +13,10 @@ Utilisateur :
 - Compte : jean
 - Mot de passe : password
 
-### Organisation du répertoire.
+### Organisation du répertoire & Contribution.
 Les différents éléments de documentation sont disponibles sous le dossier [/Documentation](/Documentation).
 Les différentes versions publiées du canevas sont rapidement accessibles à l'aide des *tags* définis, permettant de retrouver l'état du répértoire pour une version donnée. L'onglet "Releases" sur la droite est utilisable pour consulter aisément celles-ci.
+
 Les branches identifient les différent travaux en cours : *main* correspondant à la branche stable, develop à la branche de travail, et toute autre branche represente un ajout indivduel en cours de développement. Ce [schéma](/Documentation/Ressources/Branches.jpg) illustre le flux de travail. Le mode de contribution est également indiqué sous [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 
@@ -28,3 +29,7 @@ FranceConnect est porté par la direction interministérielle du numérique, ou 
 
 
 La documentation d'implémentation FranceConnect est disponible sur le [portail partenaires](https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-service) fourni par la DINUM.
+
+### Tierces Parties
+
+Le projet présent se base sur la souche Open Source IdentityServer4 et incorpore du code de [IdentityServer4.Templates](https://github.com/IdentityServer/IdentityServer4.Templates). Des informations supplémentaires sont présentes dans les en-têtes des différents fichiers source, ainsi que sous [NOTICE.md](NOTICE.md)
