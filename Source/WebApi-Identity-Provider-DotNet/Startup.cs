@@ -57,7 +57,7 @@ namespace WebApi_Identity_Provider_DotNet
             });
             // Instead of adding a valid asymmetric credential through builder.AddSigningCredential,
             // we use internal methods to manually add our signing and validation key credential (HS256, the only signing mechanism supported by FranceConnect as of today, which is symmetric and thus refused by builder.AddSigningCredential).
-            // This is a workaround, and today there are better options such as migrating to another Identity Provider like OpenIddict, which properly supports symmetric credential.
+            // This is a workaround as FranceConnect currently does not support assymetric signing keys.
             SigningCredentials franceConnectSigningCredential = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfig.FranceConnectSecret)), "HS256");
             SecurityKeyInfo franceConnectSecuritykeyInfo = new SecurityKeyInfo
             {
