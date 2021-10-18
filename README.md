@@ -1,10 +1,10 @@
 # Kit de démarrage FranceConnect - Fournisseur d'identité (FI) #
 
-Ce projet exemple propose un canevas de site web en [ASP.NET Core](https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core "ASP.NET Core") 3.1/[IdentityServer](http://www.dotnetfoundation.org/thinktectureidentityserver "IdentityServer") qui s’appuie sur FranceConnect pour identifier les internautes qui le souhaitent.
+Ce projet exemple propose un canevas de site web en [ASP.NET Core](https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core "ASP.NET Core"), faisant office de fournisseur d'identité OpenIDConnect à l'aide de [IdentityServer](https://dotnetfoundation.org/projects/identityserver), pour pour identifier les internautes qui le souhaitent depuis FranceConnect.
 
 Vous pouvez trouver sur ce répertoire **[la documentation associée](/Documentation)**, ainsi que le **[le guide de démarrage rapide](/Source/README.md)** afin d'exécuter le canevas localement.
 
-La version utilisée est ASP.NET Core 3.1 (LTS)
+La version utilisée est .NET Core 3.1 (LTS)
 
 #### Fournisseur d'identité 
 Le canevas ainsi proposé est aujourd'hui en chantier afin de pouvoir y accéder depuis l'environnement FranceConnect
@@ -13,12 +13,15 @@ Utilisateur :
 - Compte : jean
 - Mot de passe : password
 
-### Organisation du répertoire & Contribution.
+### Organisation du répertoire.
 Les différents éléments de documentation sont disponibles sous le dossier [/Documentation](/Documentation).
-Les différentes versions publiées du canevas sont rapidement accessibles à l'aide des *tags* définis, permettant de retrouver l'état du répértoire pour une version donnée. L'onglet "Releases" sur la droite est utilisable pour consulter aisément celles-ci.
 
-Les branches identifient les différent travaux en cours : *main* correspondant à la branche stable, develop à la branche de travail, et toute autre branche represente un ajout indivduel en cours de développement. Ce [schéma](/Documentation/Ressources/Branches.jpg) illustre le flux de travail. Le mode de contribution est également indiqué sous [CONTRIBUTING.md](/CONTRIBUTING.md)
+Les différentes versions publiées du canevas sont rapidement accessibles à l'aide des *tags* définis, permettant de retrouver l'état du répértoire pour une version donnée. 
+L'onglet "Releases" sur la droite est utilisable pour consulter aisément celles-ci.
 
+Les branches identifient les différent travaux en cours : *main* correspondant à la branche stable, develop à la branche de travail, et toute autre branche represente un ajout individuel en cours de développement.
+
+Ce [schéma](/Documentation/Ressources/Branches.jpg) illustre le flux de travail. Le mode de contribution est également indiqué sous [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 ### FranceConnect 
 La plateforme [FranceConnect](https://franceconnect.gouv.fr/) est un système d’identification visant à faciliter l’accès des usagers aux services numériques de l’administration en ligne, en évitant à tout un chacun de devoir créer un nouveau compte lors de l’accès à un nouveau service et donc à se remémorer différents mots de passe pour l’ensemble des services accédés.
@@ -27,8 +30,8 @@ Pour cela, le système FranceConnect permet à chaque usager de disposer d’un 
 
 FranceConnect est porté par la direction interministérielle du numérique, ou DINUM, qui accompagne les ministères dans leur transformation numérique, conseille le gouvernement et développe des services et ressources partagées comme ici ce système d’identification et d’authentification en ligne de l’État, ou encore le réseau interministériel de l’État, data.gouv.fr ou api.gouv.fr.
 
+La documentation d'implémentation du service FranceConnect est disponible sur le [portail partenaires](https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-identite) fourni par la DINUM.
 
-La documentation d'implémentation FranceConnect est disponible sur le [portail partenaires](https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-service) fourni par la DINUM.
 
 ### Tierces Parties
 
