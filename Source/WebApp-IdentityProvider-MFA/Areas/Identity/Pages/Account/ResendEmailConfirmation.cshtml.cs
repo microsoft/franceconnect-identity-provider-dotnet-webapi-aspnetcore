@@ -53,7 +53,8 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
+                // We do not indicate that the user does not exists to avoid information leak
+                ModelState.AddModelError(string.Empty, "Le mail de confirmation a été renvoyé. Consultez votre boite mail.");
                 return Page();
             }
 
@@ -67,10 +68,11 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 Input.Email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                "Confirmez votre adresse mail",
+                $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>."
+                );
 
-            ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
+            ModelState.AddModelError(string.Empty, "Le mail de confirmation a été renvoyé. Consultez votre boite mail.");
             return Page();
         }
     }

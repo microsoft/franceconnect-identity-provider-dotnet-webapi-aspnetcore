@@ -83,6 +83,8 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
             {
                 FamilyName = user.FamilyName,
                 BirthDate = user.BirthDate,
+                BirthCountry = user.BirthCountry,
+                BirthPlace = user.BirthPlace,
                 GivenName = user.GivenName,
                 Gender = user.Gender,
                 PreferredName = user.PreferredName,

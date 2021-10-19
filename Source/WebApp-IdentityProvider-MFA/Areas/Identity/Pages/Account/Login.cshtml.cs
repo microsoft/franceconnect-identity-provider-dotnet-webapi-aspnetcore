@@ -66,9 +66,10 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl ?? Url.Content("~/");
             AuthorizationRequest context = await _interaction.GetAuthorizationContextAsync(ReturnUrl);
             if (context != null)
-            {
-                await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
+            {                
                 // this will send back an access denied OIDC error response to FranceConnect
+                await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
+
                 return Redirect(ReturnUrl);
             }
             return Page();
@@ -98,7 +99,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Identifiants invalides.");
                     return Page();
                 }
             }
