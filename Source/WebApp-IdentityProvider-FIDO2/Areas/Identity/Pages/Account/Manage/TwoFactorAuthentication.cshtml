@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Http.Features
 @model TwoFactorAuthenticationModel
 @{
-    ViewData["Title"] = "Two-factor authentication (2FA)";
+    ViewData["Title"] = "Authentification à plusieurs facteurs.";
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
@@ -17,51 +17,54 @@
             if (Model.RecoveryCodesLeft == 0)
             {
                 <div class="alert alert-danger">
-                    <strong>You have no recovery codes left.</strong>
-                    <p>You must <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
+                    <strong>Vous n'avez plus aucun code de secours.</strong>
+                    <p>Veuillez <a asp-page="./GenerateRecoveryCodes">générer un nouveau jeu de codes de secours</a> avant de pouvoir vous connecter avec un code de secours.</p>
                 </div>
             }
             else if (Model.RecoveryCodesLeft == 1)
             {
                 <div class="alert alert-danger">
-                    <strong>You have 1 recovery code left.</strong>
-                    <p>You can <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
+                    <strong>Vous n'avez plus qu'un seul code de secours restant.</strong>
+                    <p>Vous pouvez <a asp-page="./GenerateRecoveryCodes">générer un nouveau jeu de codes de secours</a>.</p>
                 </div>
             }
             else if (Model.RecoveryCodesLeft <= 3)
             {
                 <div class="alert alert-warning">
-                    <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
-                    <p>You should <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
+                    <strong>Vous avez encore @Model.RecoveryCodesLeft codes de secours fonctionnels.</strong>
+                    <p>Vous pouvez <a asp-page="./GenerateRecoveryCodes">générer un nouveau jeu de codes de récupération</a>.</p>
                 </div>
             }
 
             if (Model.IsMachineRemembered)
             {
                 <form method="post" style="display: inline-block">
-                    <button type="submit" class="btn btn-primary">Forget this browser</button>
+                    <button type="submit" class="btn btn-primary">Oublier ce navigateur</button>
                 </form>
             }
-            <a asp-page="./Disable2fa" class="btn btn-primary">Disable 2FA</a>
-            <a asp-page="./GenerateRecoveryCodes" class="btn btn-primary">Reset recovery codes</a>
+            <a asp-page="./Disable2fa" class="btn btn-primary">Désactiver l'authentification à deux facteurs</a>
+            <h4>Codes de secours</h4>
+            <a asp-page="./GenerateRecoveryCodes" class="btn btn-primary">Réinitialiser vos codes de secours</a>
         }
+        
+        <hr />
 
-        <h4>Authenticator app</h4>
+        <h4>Application d'authentification</h4>
         @if (!Model.HasAuthenticator)
         {
-            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Add authenticator app</a>
+            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Ajouter une application d'authentification</a>
         }
         else
         {
-            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Set up authenticator app</a>
-            <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-primary">Reset authenticator app</a>
+            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Configurer une application d'authentification </a>
+            <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-primary">Réinitialiser vos applications d'authentification</a>
         }
     }
     else
     {
         <div class="alert alert-danger">
-            <strong>Privacy and cookie policy have not been accepted.</strong>
-            <p>You must accept the policy before you can enable two factor authentication.</p>
+            <strong>La politique de cookies et vie privée n'a pas été acceptée.</strong>
+            <p>Vous devez l'accepter afin d'activer l'authentification multi-facteurs.</p>
         </div>
     }
 }

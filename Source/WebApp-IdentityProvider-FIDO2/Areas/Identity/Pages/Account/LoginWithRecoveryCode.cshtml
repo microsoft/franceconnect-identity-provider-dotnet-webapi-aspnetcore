@@ -1,26 +1,30 @@
 ﻿@page
 @model LoginWithRecoveryCodeModel
 @{
-    ViewData["Title"] = "Recovery code verification";
+    ViewData["Title"] = "Connexion avec un code de secours";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
-<p>
-    You have requested to log in with a recovery code. This login will not be remembered until you provide
-    an authenticator app code at log in or disable 2FA and log in again.
-</p>
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-floating">
-                <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off" />
-                <label asp-for="Input.RecoveryCode" class="form-label"></label>
-                <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+<div class="row justify-content-center align-items-center">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-light" style="border-radius: 1rem;">
+            <div class="card-body p-5 text-center">
+                <h1>@ViewData["Title"]</h1>
+                <hr />
+                <p>
+                    En utilisant un code de récupération, cette session ne sera pas conservée jusqu'à ce que vous vous reconnectiez avec 
+                    un moyen d'authentification à deux facteurs, ou que vous désactiviez l'authentification à deux facteurs.
+                </p>
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-floating">
+                        <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off" />
+                        <label asp-for="Input.RecoveryCode" class="form-label"></label>
+                        <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Connexion</button>
+                </form>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-        </form>
+        </div>
     </div>
 </div>
 

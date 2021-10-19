@@ -56,9 +56,9 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
         {
 
             [Required]
-            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(7, ErrorMessage = "Le {0} doit être entre {2} et {1} caractères de long.", MinimumLength = 6)]
             [DataType(DataType.Text)]
-            [Display(Name = "Verification Code")]
+            [Display(Name = "Code de vérification")]
             public string Code { get; set; }
         }
 
@@ -97,7 +97,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
 
             if (!is2faTokenValid)
             {
-                ModelState.AddModelError("Input.Code", "Verification code is invalid.");
+                ModelState.AddModelError("Input.Code", "Le code de vérification est invalide.");
                 await LoadSharedKeyAndQrCodeUriAsync(user);
                 return Page();
             }
@@ -106,7 +106,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
             var userId = await _userManager.GetUserIdAsync(user);
             _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", userId);
 
-            StatusMessage = "Your authenticator app has been verified.";
+            StatusMessage = "Votre application d'authentification a été validée.";
 
             if (await _userManager.CountRecoveryCodesAsync(user) == 0)
             {
