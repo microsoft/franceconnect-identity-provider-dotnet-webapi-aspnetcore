@@ -79,6 +79,7 @@ var identityServerBuilder = builder.Services.AddIdentityServer(options =>
 identityServerBuilder.AddInMemoryIdentityResources(identityConfig.IdentityResources);
 identityServerBuilder.AddInMemoryClients(identityConfig.Clients);
 identityServerBuilder.AddAspNetIdentity<ApplicationUser>();
+identityServerBuilder.AddProfileService<UserProfileService>();
 
 // Instead of adding a valid asymmetric credential through builder.AddSigningCredential,
 // we use internal methods to manually add our signing and validation key credential (HS256, the only signing mechanism supported by FranceConnect as of today, which is symmetric and thus refused by builder.AddSigningCredential).
