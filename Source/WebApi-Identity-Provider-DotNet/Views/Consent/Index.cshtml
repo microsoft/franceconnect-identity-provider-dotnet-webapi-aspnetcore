@@ -1,0 +1,103 @@
+@using WebApi_Identity_Provider_DotNet.Models.Consent
+@model ConsentViewModel
+
+<div class="page-consent">
+    <div class="lead">
+        @if (Model.ClientLogoUrl != null)
+        {
+            <div class="client-logo"><img src="@Model.ClientLogoUrl"></div>
+        }
+        <h1> Consentez-vous à donner ces informations à @Model.ClientName
+        </h1>
+        <p>Décochez les permissions que vous ne souhaitez pas donner.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8">
+            <partial name="_ValidationSummary" />
+        </div>
+    </div>
+
+    <form asp-action="Index">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div class="row">
+            <div class="col-sm-8">
+                @if (Model.IdentityScopes.Any())
+                {
+                    <div class="form-group">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="glyphicon glyphicon-user"></span>
+                                Informations personnelles
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                @foreach (var scope in Model.IdentityScopes)
+                                {
+                                    <partial name="_ScopeListItem" model="@scope" />
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.ApiScopes.Any())
+                {
+                    <div class="form-group">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="glyphicon glyphicon-tasks"></span>
+                                Accès de l'application
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                @foreach (var scope in Model.ApiScopes)
+                                {
+                                    <partial name="_ScopeListItem" model="scope" />
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="glyphicon glyphicon-tasks"></span>
+                            Description
+                        </div>
+                        <div class="card-body">
+                            <input class="form-control" placeholder="Description ou nom de l'appareil" asp-for="Description" autofocus>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.AllowRememberConsent)
+                {
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" asp-for="RememberConsent">
+                            <label class="form-check-label" asp-for="RememberConsent">
+                                <strong>Se souvenir de ma décision</strong>
+                            </label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <button name="button" value="yes" class="btn btn-primary" autofocus>Accepter</button>
+                <button name="button" value="no" class="btn btn-secondary">Refuser</button>
+            </div>
+            <div class="col-sm-4 col-lg-auto">
+                @if (Model.ClientUrl != null)
+                {
+                    <a class="btn btn-outline-info" href="@Model.ClientUrl">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                        <strong>@Model.ClientName</strong>
+                    </a>
+                }
+            </div>
+        </div>
+    </form>
+</div>

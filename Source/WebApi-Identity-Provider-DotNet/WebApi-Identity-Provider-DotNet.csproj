@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<AssemblyName>WebApi-Identity-Provider</AssemblyName>
+		<PackageId>WebApi-Identity-Provider</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Update="wwwroot\**\*;Views\**\*">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="IdentityServer4" Version="4.1.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.17" />
+	</ItemGroup>
+
+	<Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+		<Exec Command="dotnet tool restore" />
+		<Exec Command="dotnet libman restore" />
+		<Exec Command="npm install" />
+		<Exec Command="gulp clean" />
+		<Exec Command="gulp min" />
+	</Target>
+</Project>
