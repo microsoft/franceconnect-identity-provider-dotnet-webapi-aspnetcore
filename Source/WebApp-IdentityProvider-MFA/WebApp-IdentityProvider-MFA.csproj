@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Fido2.AspNet" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0-rc.2.21480.10" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.0-rc.2.21480.10" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.0-rc.2.21480.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0-rc.2.21480.5" />
 	 <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0-rc.2.21480.10" />

@@ -34,7 +34,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.SignIn.RequireConfirmedAccount = true;
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddTokenProvider<FIDO2TwoFactorProvider>(FIDO2TwoFactorProvider.Constants.ProviderName);
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
