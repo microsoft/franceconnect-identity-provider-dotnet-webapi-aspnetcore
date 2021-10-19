@@ -17,6 +17,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddScoped<IFido2CredentialsStore, Fido2CredentialsStore>();
+
 // Identity Services
 
 builder.Services.AddFido2(options =>
