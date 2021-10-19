@@ -18,4 +18,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.0-rc.2.21511.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\qrcodejs\" />
+  </ItemGroup>
+
 </Project>
