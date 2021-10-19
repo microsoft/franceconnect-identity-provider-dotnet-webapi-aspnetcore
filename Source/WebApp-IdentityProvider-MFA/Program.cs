@@ -20,7 +20,17 @@ var connectionString = builder.Configuration.GetConnectionString("ApplicationDbC
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+{
+    if (builder.Environment.IsProduction())
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+    else
+    {
+        // Suggested for development environments, as the database is thus hosted with the web app instead of a separate server.
+        options.UseInMemoryDatabase("InMemory");
+    }
+});
 
 builder.Services.AddScoped<IFido2CredentialsStore, Fido2CredentialsStore>();
 #endregion
