@@ -9,7 +9,7 @@ La version utilisée est .NET Core 6.0 (LTS)
 
 La documentation est en chantier, et des travaux sont en cours afin que le fournisseur de démonstration soit testable depuis les environnements d'integration FranceConnect.
 
-Vous pouvez néanmoins découvrir et tester le fonctionnement du canevas et de ses capacités d'authentification forte à l'adresse <https://franceconnect-identity-provider-dotnet-webapi-aspnetcore.azurewebsites.net>
+Vous pouvez néanmoins découvrir et tester le fonctionnement du canevas et de ses capacités d'authentification forte à l'adresse <https://aka.ms/FranceConnect-FI>
 
 ### Organisation du répertoire.
 Les différents éléments de documentation sont disponibles sous le dossier [/Documentation](/Documentation).
