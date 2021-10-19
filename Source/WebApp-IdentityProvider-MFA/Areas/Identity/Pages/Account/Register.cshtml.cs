@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using WebApp_IdentityProvider_MFA.Data;
-using WebApp_IdentityProvider_MFA.Helpers.Validation;
+using WebApp_IdentityProvider_MFA.Models;
 using WebApp_IdentityProvider_MFA.Services;
 
 namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
@@ -57,7 +57,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
         {
             [Required]
             [EmailAddress]
-            [Display(Name = "Adresse e-mail*")]
+            [Display(Name = "Adresse e-mail")]
             public string Email { get; set; }
 
             [Required]
@@ -66,27 +66,38 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             [Display(Name = "Mot de passe")]
             public string Password { get; set; }
 
+            [Required]
             [DataType(DataType.Password)]
             [Display(Name = "Confirmer le mot de passe")]
             [Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
 
             [Required]
-            [Display(Name = "Genre*")]
+            [Display(Name = "Genre")]
             [GenderValidation]
             public string Gender { get; set; }
 
+            [Required]
             [DataType(DataType.Date)]
             [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
             [Display(Name = "Date de naissance")]
-            public DateTime? Birthdate { get; set; }
+            public DateTime BirthDate { get; set; }
 
             [Required]
-            [Display(Name = "Prénom*")]
+            [StringLength(6, MinimumLength = 5)]
+            [Display(Name = "Lieu de naissance au format INSEE a 5 chiffres")]
+            public string BirthPlace { get; set; }
+
+            [Required]
+            [StringLength(6, MinimumLength = 5)]
+            [Display(Name = "Pays de naissance au format INSEE a 5 chiffres")]
+            public string BirthCountry { get; set; }
+            [Required]
+            [Display(Name = "Prénom")]
             public string GivenName { get; set; }
 
             [Required]
-            [Display(Name = "Nom*")]
+            [Display(Name = "Nom")]
             public string FamilyName { get; set; }
 
             [Display(Name = "Nom d'usage")]
@@ -104,13 +115,15 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser
+                var user = new ApplicationUser//TODO
                 {
                     GivenName = Input.GivenName,
                     FamilyName = Input.FamilyName,
-                    Birthdate = Input.Birthdate,
+                    BirthDate = Input.BirthDate,
+                    BirthCountry = Input.BirthCountry,
+                    BirthPlace= Input.BirthPlace,
                     Gender = Input.Gender,
-                    PreferredName= Input.PreferredName
+                    PreferredName = Input.PreferredName
                 };
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);

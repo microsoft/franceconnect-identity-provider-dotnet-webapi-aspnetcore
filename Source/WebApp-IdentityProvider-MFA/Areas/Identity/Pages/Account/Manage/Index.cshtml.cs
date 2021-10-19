@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebApp_IdentityProvider_MFA.Data;
-using WebApp_IdentityProvider_MFA.Helpers.Validation;
+using WebApp_IdentityProvider_MFA.Models;
 
 namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
 {
@@ -40,25 +40,35 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
         public class InputModel
         {
             [Required]
-            [Display(Name = "Genre*")]
+            [Display(Name = "Genre")]
             [GenderValidation]
             public string Gender { get; set; }
 
-            [DataType(DataType.Date)]
-            [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
-            [Display(Name = "Date de naissance")]
-            public DateTime? Birthdate { get; set; }
 
             [Required]
-            [Display(Name = "Prénom*")]
+            [Display(Name = "Prénom")]
             public string GivenName { get; set; }
 
             [Required]
-            [Display(Name = "Nom*")]
+            [Display(Name = "Nom")]
             public string FamilyName { get; set; }
 
             [Display(Name = "Nom d'usage")]
             public string PreferredName { get; set; }
+
+            [DataType(DataType.Date)]
+            [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+            [Display(Name = "Date de naissance")]
+            public DateTime BirthDate { get; set; }
+            [Required]
+            [StringLength(6, MinimumLength = 5)]
+            [Display(Name = "Lieu de naissance au format INSEE a 5 chiffres")]
+            public string BirthPlace { get; set; }
+
+            [Required]
+            [StringLength(6, MinimumLength = 5)]
+            [Display(Name = "Pays de naissance au format INSEE a 5 chiffres")]
+            public string BirthCountry { get; set; }
 
             [Phone]
             [Display(Name = "Phone number")]
@@ -72,7 +82,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
             Input = new InputModel
             {
                 FamilyName = user.FamilyName,
-                Birthdate = user.Birthdate,
+                BirthDate = user.BirthDate,
                 GivenName = user.GivenName,
                 Gender = user.Gender,
                 PreferredName = user.PreferredName,
@@ -111,7 +121,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
                 user.GivenName = Input.GivenName;
                 user.Gender = Input.Gender;
                 user.FamilyName = Input.FamilyName;
-                user.Birthdate = Input.Birthdate;
+                user.BirthDate = Input.BirthDate;
             }
             var userUpdateResult = await _userManager.UpdateAsync(user);
             if (!userUpdateResult.Succeeded)
