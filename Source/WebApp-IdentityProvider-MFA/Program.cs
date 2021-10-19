@@ -1,15 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using IdentityServer4.Models;
+using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using WebApp_IdentityProvider_MFA;
 using WebApp_IdentityProvider_MFA.Data;
 using WebApp_IdentityProvider_MFA.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// Database Services
+#region Database Services
 
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -18,8 +22,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IFido2CredentialsStore, Fido2CredentialsStore>();
-
-// Identity Services
+#endregion
+#region Identity Services
 
 builder.Services.AddFido2(options =>
 {
@@ -43,10 +47,54 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
-
+#endregion
 builder.Services.AddTransient<IEmailSender, AuthMessageSender>();
 
-// MVC & Pages
+#region IdentityServer & FranceConnect
+
+if (string.IsNullOrEmpty(builder.Configuration["FranceConnect:ClientSecret"]))
+{
+    throw new InvalidOperationException("FC Client Secret not found. It must be added to the configuration, through User Secrets for example.");
+    // User-Secrets documentation : https://docs.asp.net/en/latest/security/app-secrets.html
+}
+
+IdentityInMemoryConfiguration identityConfig = new(builder.Configuration["FranceConnect:ClientId"], builder.Configuration["FranceConnect:ClientSecret"], builder.Configuration["FranceConnect:RedirectUri"]);
+builder.Services.AddSingleton(identityConfig);
+
+var identityServerBuilder = builder.Services.AddIdentityServer(options =>
+{
+    options.Events.RaiseErrorEvents = true;
+    options.Events.RaiseInformationEvents = true;
+    options.Events.RaiseFailureEvents = true;
+    options.Events.RaiseSuccessEvents = true;
+
+    // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
+    options.EmitStaticAudienceClaim = true;
+
+    options.UserInteraction.ErrorUrl = "/error";
+
+    //We use symmetric keys with FranceConnect so this endpoint is not relevant
+    options.Discovery.ShowKeySet = false;
+});
+identityServerBuilder.AddInMemoryIdentityResources(identityConfig.IdentityResources);
+identityServerBuilder.AddInMemoryClients(identityConfig.Clients);
+identityServerBuilder.AddAspNetIdentity<ApplicationUser>();
+
+// Instead of adding a valid asymmetric credential through builder.AddSigningCredential,
+// we use internal methods to manually add our signing and validation key credential (HS256, the only signing mechanism supported by FranceConnect as of today, which is symmetric and thus refused by builder.AddSigningCredential).
+// This is a workaround as FranceConnect currently does not support assymetric signing keys.
+SigningCredentials franceConnectSigningCredential = new(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfig.FranceConnectSecret)), "HS256");
+SecurityKeyInfo franceConnectSecuritykeyInfo = new()
+{
+    Key = franceConnectSigningCredential.Key,
+    SigningAlgorithm = franceConnectSigningCredential.Algorithm
+};
+
+identityServerBuilder.Services.AddSingleton<ISigningCredentialStore>(new InMemorySigningCredentialsStore(franceConnectSigningCredential));
+identityServerBuilder.Services.AddSingleton<IValidationKeysStore>(new InMemoryValidationKeysStore(new[] { franceConnectSecuritykeyInfo }));
+#endregion
+
+
 builder.Services.AddRazorPages(options =>
         {
             // Require a logged in user to access the logout page and all the Manage pages.
@@ -56,6 +104,10 @@ builder.Services.AddRazorPages(options =>
         })
     .AddNewtonsoftJson(); 
 // the FIDO2 library requires NewtonsoftJson as of v2.0.2 . They are currently migrating it to System.Text.Json which will allow us to remove this call and the NewtonsoftJson dependency
+
+
+builder.Services.AddHealthChecks();
+// To add specific health checks, such as database probe, read more here https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks-1
 
 
 var app = builder.Build();
@@ -76,10 +128,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication();
 
+// UseIdentityServer includes a call to useAuthentication so it is not necessary.
+app.UseIdentityServer();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.MapHealthChecks("/health");
 
 app.Run();
