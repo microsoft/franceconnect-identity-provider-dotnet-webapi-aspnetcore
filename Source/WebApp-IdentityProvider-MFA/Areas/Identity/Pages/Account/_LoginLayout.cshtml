@@ -11,7 +11,14 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
+                @if (Model is LoginModel && Model.IsFranceConnectLoginRequest)
+                {
+                <a data-icon="back" asp-page="Login" asp-page-handler="CancelLogin" asp-route-returnUrl="@Model.ReturnUrl" > &lt Revenir sur FranceConnect</a>
+                }
+                else
+                {
                 <a href="javascript:history.back()" data-icon="back"> &lt Retour</a>
+                }
                 <div class="navbar d-sm-inline-flex justify-content-between d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
