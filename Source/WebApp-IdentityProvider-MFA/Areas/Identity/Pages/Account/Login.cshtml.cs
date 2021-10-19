@@ -57,13 +57,13 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            ReturnUrl = returnUrl ?? Url.Content("~/");
+            ReturnUrl = returnUrl ?? Url.Content("~/Identity/Account/Manage");
             // check if we are in the context of an authorization request
             IsFranceConnectLoginRequest = (await _interaction.GetAuthorizationContextAsync(ReturnUrl) != null);
         }
         public async Task<IActionResult> OnGetCancelLoginAsync(string returnUrl = null)
         {
-            ReturnUrl = returnUrl ?? Url.Content("~/");
+            ReturnUrl = returnUrl ?? Url.Content("~/Identity/Account/Manage");
             AuthorizationRequest context = await _interaction.GetAuthorizationContextAsync(ReturnUrl);
             if (context != null)
             {                
@@ -77,7 +77,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
         }
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            ReturnUrl = returnUrl ?? Url.Content("~/");
+            ReturnUrl = returnUrl ?? Url.Content("~/Identity/Account/Manage");
             if (ModelState.IsValid)
             {
                 // TODO :This doesn't count login failures towards account lockout

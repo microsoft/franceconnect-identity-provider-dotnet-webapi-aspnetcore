@@ -37,7 +37,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("/Index");
             }
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= Url.Content("~/Identity/Account/Manage");
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)

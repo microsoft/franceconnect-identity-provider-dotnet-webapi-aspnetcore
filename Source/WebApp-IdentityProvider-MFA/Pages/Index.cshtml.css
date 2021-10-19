@@ -1,0 +1,10 @@
+﻿#hero-display {
+    background-image: url("/images/MSSecurityBackground.gif");
+    background-position: center;
+    background-size: cover;
+}
+
+.social > a {
+    text-decoration: none;
+    border: none;
+}

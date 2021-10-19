@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Identity Provider </title>
+    <title>@ViewData["Title"] - Fournisseur d'identité ASP.NET Core</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
+            <div class="container">
                 @if (Model is LoginModel && Model.IsFranceConnectLoginRequest)
                 {
                 <a data-icon="back" asp-page="Login" asp-page-handler="CancelLogin" asp-route-returnUrl="@Model.ReturnUrl" > &lt Revenir sur FranceConnect</a>
@@ -22,7 +22,7 @@
                 <div class="navbar d-sm-inline-flex justify-content-between d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="navbar-brand" asp-area="" asp-page="/Index">FC Identity Provider Sample</a>
+                            <a class="navbar-brand" asp-area="" asp-page="/Index">Fournisseur d'identité ASP.NET Core</a>
                         </li>
                     </ul>
                 </div>
@@ -35,9 +35,9 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted mt-auto">
         <div class="container">
-            &copy; 2021 - Microsoft - <a asp-area="" asp-controller="Home" asp-action="Privacy">Protection des données</a>
+            &copy; 2021 - Microsoft France - <a asp-area="" asp-page="/Privacy">Protection des données</a> - <a href="https://www.microsoft.com/security" >Sécurité</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

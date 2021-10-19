@@ -112,7 +112,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= Url.Content("~/Identity/Account/Manage");
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser//TODO

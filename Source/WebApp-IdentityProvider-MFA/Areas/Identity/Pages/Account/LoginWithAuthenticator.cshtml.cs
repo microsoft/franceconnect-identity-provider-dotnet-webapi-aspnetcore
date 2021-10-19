@@ -66,7 +66,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
                 return Page();
             }
 
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= Url.Content("~/Identity/Account/Manage");
 
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)

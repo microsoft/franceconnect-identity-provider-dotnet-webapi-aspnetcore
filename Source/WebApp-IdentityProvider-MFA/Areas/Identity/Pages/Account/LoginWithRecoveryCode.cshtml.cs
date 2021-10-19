@@ -79,7 +79,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", userId);
-                return LocalRedirect(returnUrl ?? Url.Content("~/"));
+                return LocalRedirect(returnUrl ?? Url.Content("~/Identity/Account/Manage"));
             }
             if (result.IsLockedOut)
             {
