@@ -1,0 +1,26 @@
+﻿@page
+@model GenerateRecoveryCodesModel
+@{
+    ViewData["Title"] = "Générer des codes de secours pour l'authentification à deux facteurs";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>Conservez ces codes en lieu sûr.</strong>
+    </p>
+    <p>
+        Si vous perdez votre appareil et n'avez pas de codes de récuperations, vous perdrez accès à votre compte.
+    </p>
+    <p>
+        Générer de nouveaux codes de secours n'influe pas sur vos clés de sécurité et application d'authentification déjà en place. 
+    </p>
+</div>
+<div>
+    <form method="post">
+        <button class="btn btn-danger" type="submit">Générer des codes de secours</button>
+    </form>
+</div>

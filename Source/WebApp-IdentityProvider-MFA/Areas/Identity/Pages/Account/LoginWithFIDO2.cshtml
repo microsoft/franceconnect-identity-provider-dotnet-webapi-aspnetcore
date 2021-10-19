@@ -1,0 +1,51 @@
+﻿@page
+
+@model LoginWithFIDO2Model
+@{
+    Layout = "./_LoginLayout.cshtml";
+    ViewData["Title"] = "Authentification à deux facteurs";
+}
+
+<div class="notification is-danger" style="display:none">
+    Please note: Your browser does not seem to support WebAuthn yet. <a href="https://caniuse.com/#search=webauthn" target="_blank">Supported browsers</a>
+</div>
+
+<div class="row justify-content-center align-items-center">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-light" style="border-radius: 1rem;">
+            <div class="card-body p-5 text-center">
+                <h1>@ViewData["Title"]</h1>
+                <hr />
+                <form method="post" asp-route-returnUrl="@Model.ReturnUrl" id="login-mfa-fido2">
+                    <input asp-for="RememberMe" type=hidden/>
+                    <input id="cred-options" asp-for="@Model.CredentialAssertionOptions" type=hidden/>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-floating">
+                        <input id="asserted-cred" asp-for="Input.AssertedResponse" class="form-control" type="hidden"/>
+                        <span id="cred-message" asp-validation-for="Input.AssertedResponse" class="text-warning"></span>
+                    </div>
+                    <div>
+                        <div class="checkbox">
+                            <label asp-for="Input.RememberMachine" class="form-label">
+                                <input asp-for="Input.RememberMachine" />
+                                @Html.DisplayNameFor(m => m.Input.RememberMachine)
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-100 btn btn-lg btn-primary">Connexion avec une clé de sécurité</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script src="~/js/helpers.js"></script>
+    <script src="~/js/mfa.login.js"></script>
+}

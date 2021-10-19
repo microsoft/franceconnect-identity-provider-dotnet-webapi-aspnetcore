@@ -1,0 +1,24 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Confirmation d'inscription";
+}
+
+<h1>@ViewData["Title"]</h1>
+<!--TODO : Remove once there is a real email sender.-->
+@{
+    if (@Model.DisplayConfirmAccountLink)
+    {
+<p>
+    Cette application n'est actuellement pas capable d'envoyer un email. Consultez <a href="https://aka.ms/aspaccountconf">ces documentations</a> pour en savoir plus.
+    En temps normal ceci serait envoyé par mail : <a id="confirm-link" href="@Model.EmailConfirmationUrl">Cliquez ici pour confirmer votre compte</a>
+</p>
+    }
+    else
+    {
+<p>
+        Consultez vos emails pour confirmer votre compte, ou demandez à <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Renvoyer le mail de confirmation</a>
+</p>
+    }
+}
+

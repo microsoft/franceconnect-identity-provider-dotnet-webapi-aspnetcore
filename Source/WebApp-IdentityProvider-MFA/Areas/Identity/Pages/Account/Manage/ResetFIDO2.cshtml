@@ -1,0 +1,23 @@
+﻿@page
+@model ResetFIDO2Model
+@{
+    ViewData["Title"] = "Oublier vos clés de sécurité";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>Si vous oubliez vos clés de sécurités, vous ne pourrez plus les utiliser pour vous connecter à ce compte jusqu'à ce que vous les ayiez réenregistrées.</strong>
+    </p>
+    <p>
+        Ce processus peut désactiver l'authentification à deux facteurs jusqu'à ce qu'elle soit reconfigurée.
+    </p>
+</div>
+<div>
+    <form id="reset-authenticator-form" method="post">
+        <button id="reset-authenticator-button" class="btn btn-danger" type="submit">Oublier toutes vos clés de sécurité</button>
+    </form>
+</div>

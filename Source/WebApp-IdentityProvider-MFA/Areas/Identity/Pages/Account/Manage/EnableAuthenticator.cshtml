@@ -1,0 +1,54 @@
+﻿@page
+@model EnableAuthenticatorModel
+@{
+    ViewData["Title"] = "Configurer une application d'authentification";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+<div>
+    <p>Pour utiliser une application d'authentification, suivez les étapes suivantes</p>
+    <ol class="list">
+        <li>
+            <p>
+                Téléchargez une application d'authentification telle que Microsoft Authenticator pour
+                <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> et
+                <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> ou
+                Google Authenticator pour
+                <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a> et
+                <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
+            </p>
+        </li>
+        <li>
+            <p>Scannez le QR Code ou entrez la clé <kbd>@Model.SharedKey</kbd> dans votre application d'authentification. Les majuscules et espaces sont ignorés.</p>
+            <div id="qrCode"></div>
+            <div id="qrCodeData" data-url="@Model.AuthenticatorUri"></div>
+        </li>
+        <li>
+            <p>
+                Une fois le QR Code scanné ou la clé tapée, votre application d'authentification vous fournira un code unique. Entrez le ci-dessous.
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <form id="send-code" method="post">
+                        <div class="form-floating">
+                            <input asp-for="Input.Code" class="form-control" autocomplete="off" />
+                            <label asp-for="Input.Code" class="control-label form-label">Code de vérification</label>
+                            <span asp-validation-for="Input.Code" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="w-100 btn btn-lg btn-primary">Valider</button>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </li>
+    </ol>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript" src="~/lib/qrcodejs/qrcode.min.js"></script>
+    <script type="text/javascript" src="~/js/generate-qr-code.js"></script>
+}

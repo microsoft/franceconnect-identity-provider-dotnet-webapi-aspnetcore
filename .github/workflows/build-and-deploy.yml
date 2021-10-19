@@ -10,11 +10,12 @@ on:
       - 'Source/**'
 env:
   AZURE_WEBAPP_NAME: franceconnect-identity-provider-dotnet-webapi-aspnetcore
-  AZURE_WEBAPP_PACKAGE_PATH: Source/WebApi-Identity-Provider-DotNet/publish
+  AZURE_WEBAPP_PACKAGE_PATH: Source/WebApp-IdentityProvider-MFA/publish
   AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.webapp_publish_profile }}
   CONFIGURATION: Debug
-  DOTNET_CORE_VERSION: 3.1.x
-  WORKING_DIRECTORY: Source/WebApi-Identity-Provider-DotNet/
+  ASPNETCORE_ENVIRONMENT: Development
+  DOTNET_CORE_VERSION: 6.0.x
+  WORKING_DIRECTORY: Source/WebApp-IdentityProvider-MFA
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -24,6 +25,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+        include-prerelease: true # TODO : Remove this line after .NET 6.0 official release.
     - name: Restore dotnet tools
       run: dotnet tool restore
       working-directory: ${{ env.WORKING_DIRECTORY }}
@@ -50,3 +52,9 @@ jobs:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
         publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+    - name: Apply database migrations
+      if: ${{ steps.deploy.conclusion == 'success' && env.ASPNETCORE_ENVIRONMENT == 'Production' }}
+      run: dotnet ef database update --project "${{ env.WORKING_DIRECTORY }}"
+      env:
+          FRANCECONNECT__CLIENTSECRET: "Dummy value in order for the project to pass startup checks"

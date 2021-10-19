@@ -1,0 +1,24 @@
+﻿@page
+@model Disable2faModel
+@{
+    ViewData["Title"] = "Désactiver l'authentification à deux facteurs.";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+
+<div class="alert alert-warning" role="alert">
+    <p>
+        <strong>Cette action désactive uniquement la nécessité d'utiliser un second facteur lors de la connexion.</strong>
+    </p>
+    <p>
+        Désactiver l'authentification a deux facteurs n'invalide pas les clés de sécurité ou applications d'authentification.</a>
+    </p>
+</div>
+
+<div>
+    <form method="post">
+        <button class="btn btn-danger" type="submit">Désactiver l'authentification à deux facteurs</button>
+    </form>
+</div>
