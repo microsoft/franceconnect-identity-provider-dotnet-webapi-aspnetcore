@@ -28,13 +28,11 @@ builder.Services.AddTransient<IEmailSender, AuthMessageSender>();
 
 builder.Services.AddRazorPages(options =>
         {
-            //Require a logged in user to access the logout page and the all the Manage pages.
+            // Require a logged in user to access the logout page and all the Manage pages.
+            // Using the [Authorize] attribute on Controllers, Razor Pages, or Action Methods, is another way to manage the access MVC/Razor Pages.
             options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
             options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
         });
-// Using the [Authorize] attribute on Controllers, Razor Pages, or Action Methods, is another way to manage the access MVC/Razor Pages.
-
-builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
@@ -59,8 +57,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

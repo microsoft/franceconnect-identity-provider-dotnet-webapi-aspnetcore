@@ -45,7 +45,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             var result = await _userManager.ChangeEmailAsync(user, email, code);
             if (!result.Succeeded)
             {
-                StatusMessage = "Error changing email.";
+                StatusMessage = "Erreur lors de la modification de votre adresse email.";
                 return Page();
             }
 
@@ -54,12 +54,12 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             var setUserNameResult = await _userManager.SetUserNameAsync(user, email);
             if (!setUserNameResult.Succeeded)
             {
-                StatusMessage = "Error changing user name.";
+                StatusMessage = "Erreur lors de la modification de votre nom d'utilisateur.";
                 return Page();
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Thank you for confirming your email change.";
+            StatusMessage = "Votre changement d'adresse mail a bien été confirmé.";
             return Page();
         }
     }

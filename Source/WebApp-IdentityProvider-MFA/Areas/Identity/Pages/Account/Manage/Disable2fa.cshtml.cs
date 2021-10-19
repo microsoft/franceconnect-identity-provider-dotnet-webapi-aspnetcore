@@ -60,7 +60,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
             }
 
             _logger.LogInformation("User with ID '{UserId}' has disabled 2fa.", _userManager.GetUserId(User));
-            StatusMessage = "2fa has been disabled. You can reenable 2fa when you setup an authenticator app";
+            StatusMessage = "L'authentification a deux facteurs a été désactivée. Vous pouvez la réactiver lors de la configuration d'une clé de sécurité ou application d'authentification.";
             return RedirectToPage("./TwoFactorAuthentication");
         }
     }

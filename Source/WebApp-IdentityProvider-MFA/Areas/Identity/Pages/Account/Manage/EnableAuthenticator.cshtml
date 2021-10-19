@@ -1,7 +1,7 @@
 ﻿@page
 @model EnableAuthenticatorModel
 @{
-    ViewData["Title"] = "Configurer une application d'authentification authenticator app";
+    ViewData["Title"] = "Configurer une application d'authentification";
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
@@ -21,7 +21,7 @@
             </p>
         </li>
         <li>
-            <p>Scannez le QR Code ou entrez la clé <kbd>@Model.SharedKey</kbd> dans votre application d'authentification à deux facteurs. Les majuscules et espaces sont ignorés.</p>
+            <p>Scannez le QR Code ou entrez la clé <kbd>@Model.SharedKey</kbd> dans votre application d'authentification. Les majuscules et espaces sont ignorés.</p>
             <div id="qrCode"></div>
             <div id="qrCodeData" data-url="@Model.AuthenticatorUri"></div>
         </li>
