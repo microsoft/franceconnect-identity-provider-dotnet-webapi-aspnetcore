@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using IdentityServer4.Models;
+using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -80,6 +81,10 @@ identityServerBuilder.AddInMemoryIdentityResources(identityConfig.IdentityResour
 identityServerBuilder.AddInMemoryClients(identityConfig.Clients);
 identityServerBuilder.AddAspNetIdentity<ApplicationUser>();
 identityServerBuilder.AddProfileService<UserProfileService>();
+
+
+//This service adds a EidasLevelClaim to the id token.
+identityServerBuilder.Services.AddTransient<IClaimsService, EidasLevelClaimService>();
 
 // Instead of adding a valid asymmetric credential through builder.AddSigningCredential,
 // we use internal methods to manually add our signing and validation key credential (HS256, the only signing mechanism supported by FranceConnect as of today, which is symmetric and thus refused by builder.AddSigningCredential).
