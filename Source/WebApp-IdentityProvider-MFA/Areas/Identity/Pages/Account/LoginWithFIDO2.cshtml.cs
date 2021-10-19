@@ -1,45 +1,59 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Identity;
 using WebApp_IdentityProvider_MFA.Data;
+using WebApp_IdentityProvider_MFA.Services;
+using Fido2NetLib;
+using System.Text;
+using Fido2NetLib.Objects;
+using System.ComponentModel;
+using System.Text.Json;
 
 namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
 {
-    public class LoginWith2faModel : PageModel
+    public class LoginWithFIDO2Model : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<LoginWith2faModel> _logger;
+        private readonly ILogger<LoginWithFIDO2Model> _logger;
 
-        public LoginWith2faModel(
+        public LoginWithFIDO2Model(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
-            ILogger<LoginWith2faModel> logger)
+            ILogger<LoginWithFIDO2Model> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
         }
+
+
         [BindProperty]
         public InputModel Input { get; set; }
 
+        [HiddenInput(DisplayValue = false)]
         public bool RememberMe { get; set; }
 
         public string ReturnUrl { get; set; }
 
+        [ReadOnly(true)]
+        [HiddenInput(DisplayValue = false)]
+        [BindProperty]
+        public string CredentialAssertionOptions { get; set; }
+
         public class InputModel
         {
-            [Required]
-            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Insertion de la clé de sécurité en attente. Suivez les instructions qui s'affichent dans votre navigateur.")]
             [DataType(DataType.Text)]
-            [Display(Name = "Authenticator code")]
-            public string TwoFactorCode { get; set; }
-            [Display(Name = "Remember this machine")]
+            [HiddenInput(DisplayValue = false)]
+            [Display(Name = "Clé de sécurité")]
+            public string AssertedResponse { get; set; }
+
+            [Display(Name = "Ne plus demander d'authentification à deux facteurs sur cet appareil")]
             public bool RememberMachine { get; set; }
         }
 
@@ -52,7 +66,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             {
                 throw new InvalidOperationException($"Unable to load two-factor authentication user.");
             }
-
+            CredentialAssertionOptions = await _userManager.GenerateTwoFactorTokenAsync(user, FIDO2TwoFactorProvider.Constants.ProviderName);
             ReturnUrl = returnUrl;
             RememberMe = rememberMe;
 
@@ -74,26 +88,23 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
                 throw new InvalidOperationException($"Unable to load two-factor authentication user.");
             }
 
-            var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
-
-            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
-
+            var result = await _signInManager.TwoFactorSignInAsync(FIDO2TwoFactorProvider.Constants.ProviderName, Input.AssertedResponse, rememberMe, Input.RememberMachine);
             var userId = await _userManager.GetUserIdAsync(user);
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
+                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", userId);
                 return LocalRedirect(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+                _logger.LogWarning("User with ID '{UserId}' account locked out.", userId);
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
-                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+                _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", userId);
+                ModelState.AddModelError(string.Empty, "Impossible de valider la clé de sécurité.");
                 return Page();
             }
         }

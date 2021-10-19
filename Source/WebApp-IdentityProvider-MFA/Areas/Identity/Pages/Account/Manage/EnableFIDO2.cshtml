@@ -1,0 +1,38 @@
+﻿@page
+@model EnableFIDO2Model
+@{
+    ViewData["Title"] = "Configurer une clé de sécurité";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+
+<div class="notification is-danger" style="display:none">
+    Please note: Your browser does not seem to support WebAuthn yet. <a href="https://caniuse.com/#search=webauthn" target="_blank">Supported browsers</a>
+</div>
+<div>
+    <p>Munissez vous d'une clé de sécurité physique, ou d'un appareil intégrant une plateforme de sécurité (telles qu'un lecteur d'empreintes), et appuyez ci-dessous</p>
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" id="register-mfa-fido2">
+                <input id="cred-options" asp-for="@Model.CredentialRegistrationOptions" type=hidden/>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating">
+                    <input id="attested-cred" asp-for="Input.AttestationRawResponse" class="form-control" type="hidden"/>
+                    <span id="cred-message" asp-validation-for="Input.AttestationRawResponse" class="text-warning"></span>
+                </div>
+                <button type="submit" class="w-100 btn btn-lg btn-primary">Ajouter une clé de sécurité</button>
+            </form>
+        </div>
+    </div>    
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    
+    <script src="~/js/helpers.js"></script>
+    <script src="~/js/mfa.register.js"></script>
+}

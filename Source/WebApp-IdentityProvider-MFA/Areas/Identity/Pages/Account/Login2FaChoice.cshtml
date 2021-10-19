@@ -1,0 +1,29 @@
+﻿@page
+@model Login2FaChoiceModel
+@{
+    Layout = "./_LoginLayout.cshtml";
+    ViewData["Title"] = "Authentification à deux facteurs";
+}
+
+
+<div class="row justify-content-center align-items-center">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <section>
+            <div class="card bg-light" style="border-radius: 1rem;">
+                <div class="card-body p-5 text-center">
+                    <h2 class="card-title">@ViewData["Title"].</h2>
+                    <h5 class="card-subtitle">Votre compte est protégé par l'authentification a deux facteurs. Choisissez un mode de connexion.</h5>
+                    <hr />
+                        @foreach (KeyValuePair<string, string> item in @Model.Providers)
+                        {
+                            <a class="btn btn-primary btn-lg m-2" asp-page="@item.Key" asp-route-rememberMe="@Model.RememberMe" asp-route-returnUrl="@Model.ReturnUrl" role="button">@item.Value</a>
+                        }
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+}

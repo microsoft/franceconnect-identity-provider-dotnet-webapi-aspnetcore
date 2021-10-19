@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using WebApp_IdentityProvider_MFA.Data;
+using WebApp_IdentityProvider_MFA.Services;
 
 namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
 {
@@ -26,6 +27,7 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
             _logger = logger;
         }
 
+        public bool HasFIDO2{ get; set; }
         public bool HasAuthenticator { get; set; }
 
         public int RecoveryCodesLeft { get; set; }
@@ -45,8 +47,9 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
-            HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
+            var validTwoFactorProviders = await _userManager.GetValidTwoFactorProvidersAsync(user);
+            HasAuthenticator = validTwoFactorProviders.Any(provider => provider == _userManager.Options.Tokens.AuthenticatorTokenProvider);
+            HasFIDO2 = validTwoFactorProviders.Any(provider => provider == FIDO2TwoFactorProvider.Constants.ProviderName);
             Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user);
             RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user);

@@ -1,31 +1,34 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-
+#nullable disable
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using WebApp_IdentityProvider_MFA.Data;
 using WebApp_IdentityProvider_MFA.Services;
 
 namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
 {
-    public class ResetAuthenticatorModel : PageModel
+    public class ResetFIDO2Model : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger<ResetAuthenticatorModel> _logger;
+        private readonly FIDO2TwoFactorProvider _fido2TwoFactorProvider;
+        private readonly ILogger<ResetFIDO2Model> _logger;
 
-        public ResetAuthenticatorModel(
+        public ResetFIDO2Model(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<ResetAuthenticatorModel> logger)
+            FIDO2TwoFactorProvider fido2TwoFactorProvider,
+            ILogger<ResetFIDO2Model> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _fido2TwoFactorProvider = fido2TwoFactorProvider;
             _logger = logger;
         }
+
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -49,22 +52,22 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-
-
+            
             var validTwoFactorProviders = await _userManager.GetValidTwoFactorProvidersAsync(user);
-            var HasFIDO2 = validTwoFactorProviders.Any(provider => provider == FIDO2TwoFactorProvider.Constants.ProviderName);
-            if (!HasFIDO2)
+            var HasAuthenticator = validTwoFactorProviders.Any(provider => provider == _userManager.Options.Tokens.AuthenticatorTokenProvider);
+            if (!HasAuthenticator)
             {
                 await _userManager.SetTwoFactorEnabledAsync(user, false);
             }
-            await _userManager.ResetAuthenticatorKeyAsync(user);
+            await _fido2TwoFactorProvider.RemoveCredentialsAsync(user);
+
             var userId = await _userManager.GetUserIdAsync(user);
-            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", userId);
+            _logger.LogInformation("User with ID '{UserId}' has reset their security keys.", userId);
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Votre application d'authentification a été réinitialisée, vous devrez la reconfigurer.";
+            StatusMessage = "Vos clés de scurité ont été réinitialisées, vous devrez en ajouter de nouvelles.";
 
-            return RedirectToPage("./EnableAuthenticator");
+            return RedirectToPage("./EnableFIDO2");
         }
     }
 }

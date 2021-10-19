@@ -1,23 +1,28 @@
 ﻿@page
-@model LoginWith2faModel
+
+@model LoginWithFIDO2Model
 @{
-    ViewData["Title"] = "Authentification à deux facteurs.";
+    Layout = "./_LoginLayout.cshtml";
+    ViewData["Title"] = "Authentification à deux facteurs";
 }
 
-<p>Votre compte est protégé par l'authentification a deux facteurs. Veuillez entrer votre code d'authentification.</p>
+<div class="notification is-danger" style="display:none">
+    Please note: Your browser does not seem to support WebAuthn yet. <a href="https://caniuse.com/#search=webauthn" target="_blank">Supported browsers</a>
+</div>
+
 <div class="row justify-content-center align-items-center">
     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card bg-light" style="border-radius: 1rem;">
             <div class="card-body p-5 text-center">
                 <h1>@ViewData["Title"]</h1>
                 <hr />
-                <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
-                    <input asp-for="RememberMe" type="hidden" />
+                <form method="post" asp-route-returnUrl="@Model.ReturnUrl" id="login-mfa-fido2">
+                    <input asp-for="RememberMe" type=hidden/>
+                    <input id="cred-options" asp-for="@Model.CredentialAssertionOptions" type=hidden/>
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-floating">
-                        <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
-                        <label asp-for="Input.TwoFactorCode" class="form-label"></label>
-                        <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+                        <input id="asserted-cred" asp-for="Input.AssertedResponse" class="form-control" type="hidden"/>
+                        <span id="cred-message" asp-validation-for="Input.AssertedResponse" class="text-warning"></span>
                     </div>
                     <div>
                         <div class="checkbox">
@@ -28,18 +33,19 @@
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="w-100 btn btn-lg btn-primary">Connexion</button>
+                        <button type="submit" class="w-100 btn btn-lg btn-primary">Connexion avec une clé de sécurité</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
-<p>
-    Vous n'avez pas accès à votre application d'authentification ? Vous pouvez
-    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">vous connecter avec un code de récupération</a>.
-</p>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script src="~/js/helpers.js"></script>
+    <script src="~/js/mfa.login.js"></script>
 }

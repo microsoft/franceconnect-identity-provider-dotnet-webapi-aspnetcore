@@ -59,6 +59,17 @@
             <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Configurer une application d'authentification </a>
             <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-primary">Réinitialiser vos applications d'authentification</a>
         }
+        <hr />
+        <h4>Clés de sécurité</h4>
+        @if (!Model.HasFIDO2)
+        {
+            <a id="enable-authenticator" asp-page="./EnableFIDO2" class="btn btn-primary">Ajouter une clé de sécurité</a>
+        }
+        else
+        {
+            <a id="enable-authenticator" asp-page="./EnableFIDO2" class="btn btn-primary">Configurer une clé de sécurité supplémentaire</a>
+            <a id="reset-authenticator" asp-page="./ResetFIDO2" class="btn btn-primary">Oublier vos clés de sécurité</a>
+        }
     }
     else
     {
