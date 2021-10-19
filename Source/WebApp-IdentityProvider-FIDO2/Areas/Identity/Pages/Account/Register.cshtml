@@ -1,13 +1,11 @@
 ﻿@page
 @model RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Inscription";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-md-center">
+    <div class="col-md-auto">
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <h2>Create a new account.</h2>
             <hr />
@@ -26,6 +24,43 @@
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
                 <label asp-for="Input.ConfirmPassword"></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating">
+                <input asp-for="Input.Birthdate" class="form-control"/>
+                <label asp-for="Input.Birthdate"></label>
+                <span asp-validation-for="Input.Birthdate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Gender"></label>
+                <div class="form-check">
+                    <input type="radio" asp-for="Input.Gender" class="form-check-input" value="male">
+                    <label for="male" class="form-check-label">Homme</label><br>
+                </div>
+                <div class="form-check">
+                    <input type="radio" asp-for="Input.Gender" class="form-check-input" value="female">
+                    <label for="female" class="form-check-label">Femme</label><br>
+                </div>
+                <div class="form-check">
+                    <input type="radio" asp-for="Input.Gender" class="form-check-input" value="other">
+                    <label for="other" class="form-check-label">Non spécifié</label>
+                </div>
+                <span asp-validation-for="Input.Gender" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.GivenName" class="form-control"/>
+                <label asp-for="Input.GivenName"></label>
+                <span asp-validation-for="Input.GivenName" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.FamilyName" class="form-control"/>
+                <label asp-for="Input.FamilyName"></label>
+                <span asp-validation-for="Input.FamilyName" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.PreferredName" class="form-control"/>
+                <label asp-for="Input.PreferredName"></label>
+                <span asp-validation-for="Input.PreferredName" class="text-danger"></span>
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebApp_IdentityProvider_MFA.Data;
+using WebApp_IdentityProvider_MFA.Helpers.Validation;
 
 namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
 {
@@ -38,6 +39,26 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
+            [Required]
+            [Display(Name = "Genre*")]
+            [GenderValidation]
+            public string Gender { get; set; }
+
+            [DataType(DataType.Date)]
+            [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+            [Display(Name = "Date de naissance")]
+            public DateTime? Birthdate { get; set; }
+
+            [Required]
+            [Display(Name = "Prénom*")]
+            public string GivenName { get; set; }
+
+            [Required]
+            [Display(Name = "Nom*")]
+            public string FamilyName { get; set; }
+
+            [Display(Name = "Nom d'usage")]
+            public string PreferredName { get; set; }
 
             [Phone]
             [Display(Name = "Phone number")]
@@ -46,13 +67,15 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
 
         private async Task LoadAsync(ApplicationUser user)
         {
-            var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
 
             Input = new InputModel
             {
+                FamilyName = user.FamilyName,
+                Birthdate = user.Birthdate,
+                GivenName = user.GivenName,
+                Gender = user.Gender,
+                PreferredName = user.PreferredName,
                 PhoneNumber = phoneNumber
             };
         }
@@ -83,19 +106,28 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
+                user.PreferredName = Input.PreferredName;
+                user.GivenName = Input.GivenName;
+                user.Gender = Input.Gender;
+                user.FamilyName = Input.FamilyName;
+                user.Birthdate = Input.Birthdate;
+            }
+            var userUpdateResult = await _userManager.UpdateAsync(user);
+            if (!userUpdateResult.Succeeded)
+            {
+                StatusMessage = "Erreur lors de la mise à jour du profil.";
+                return RedirectToPage();
+            }
+            var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+            if (!setPhoneResult.Succeeded)
+            {
+                StatusMessage = "Erreur lors de la mise à jour du profil.";
+                return RedirectToPage();
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Votre profil a été mis à jour.";
             return RedirectToPage();
         }
     }

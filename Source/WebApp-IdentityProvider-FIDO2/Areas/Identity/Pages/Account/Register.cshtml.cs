@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using WebApp_IdentityProvider_MFA.Data;
+using WebApp_IdentityProvider_MFA.Helpers.Validation;
 using WebApp_IdentityProvider_MFA.Services;
 
 namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
@@ -54,22 +55,42 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-
             [Required]
             [EmailAddress]
-            [Display(Name = "Email")]
+            [Display(Name = "Adresse e-mail*")]
             public string Email { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Le {0} doit faire au minimum {2} charactères de long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Mot de passe")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Confirmer le mot de passe")]
+            [Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
+
+            [Required]
+            [Display(Name = "Genre*")]
+            [GenderValidation]
+            public string Gender { get; set; }
+
+            [DataType(DataType.Date)]
+            [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+            [Display(Name = "Date de naissance")]
+            public DateTime? Birthdate { get; set; }
+
+            [Required]
+            [Display(Name = "Prénom*")]
+            public string GivenName { get; set; }
+
+            [Required]
+            [Display(Name = "Nom*")]
+            public string FamilyName { get; set; }
+
+            [Display(Name = "Nom d'usage")]
+            public string PreferredName { get; set; }
         }
 
 
@@ -83,7 +104,14 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var user = new ApplicationUser
+                {
+                    GivenName = Input.GivenName,
+                    FamilyName = Input.FamilyName,
+                    Birthdate = Input.Birthdate,
+                    Gender = Input.Gender,
+                    PreferredName= Input.PreferredName
+                };
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -102,8 +130,8 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId, code, returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirmez votre adresse mail",
+                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -123,20 +151,6 @@ namespace WebApp_IdentityProvider_MFA.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
-        }
-
-        private ApplicationUser CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<ApplicationUser>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-            }
         }
 
         private IUserEmailStore<ApplicationUser> GetEmailStore()
