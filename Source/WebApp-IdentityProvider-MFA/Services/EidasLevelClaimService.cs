@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
 using IdentityModel;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;

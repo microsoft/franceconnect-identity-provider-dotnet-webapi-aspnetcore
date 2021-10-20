@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
 using System.Text;
 using Fido2NetLib.Objects;
 using Fido2NetLib;

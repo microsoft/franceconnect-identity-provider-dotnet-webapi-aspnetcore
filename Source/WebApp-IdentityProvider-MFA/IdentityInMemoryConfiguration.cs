@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft France.
 // Licensed under the MIT License.
 
 using IdentityModel;
