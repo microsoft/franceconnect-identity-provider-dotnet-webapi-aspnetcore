@@ -1,6 +1,8 @@
 # Kit de démarrage FranceConnect - Fournisseur d'identité (FI) 
 ## Compatible avec l'authentification à deux facteurs, via application d'authentification (TOTP), ou via clé de sécurité (FIDO2)
 
+**AVERTISSEMMENT : CE PROJET EST CONSIDERE COMME DEPRECIE. IL N'EST PLUS MAINTENU EN L'ETAT.** 
+
 Ce projet exemple propose un canevas de site web en [ASP.NET Core](https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core "ASP.NET Core"), faisant office de fournisseur d'identité OpenIDConnect à l'aide de [IdentityServer](https://dotnetfoundation.org/projects/identityserver), pour pour identifier les internautes qui le souhaitent depuis FranceConnect.
 
 Vous pouvez trouver sur ce répertoire **[la documentation associée](/Documentation)**, ainsi que le **[le guide de démarrage rapide](/Source/README.md)** afin d'exécuter le canevas localement.
